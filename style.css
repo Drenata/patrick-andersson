@@ -1,0 +1,44 @@
+*{
+  font-family: sans-serif;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+}
+
+html,body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body{
+  background: rgba(43,44,48,1)
+}
+
+a{
+  text-decoration: none;
+  color: #fff;
+}
+
+a:hover{
+  text-shadow: 4px 4px 4px #000;
+}
+
+.content{
+  display: flex;
+  height: 100%;
+  font-size: 4em;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.projects{
+  position: absolute;
+  right: 1em;
+  bottom: 1em;
+  font-size: 2em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; 
+}
