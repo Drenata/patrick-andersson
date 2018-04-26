@@ -20,7 +20,7 @@ a{
 }
 
 a:hover{
-  text-shadow: 4px 4px 4px #000;
+  color: rgba(255, 255, 255, 0.33);
 }
 
 .content{
@@ -41,4 +41,53 @@ a:hover{
   flex-direction: column;
   justify-content: center;
   align-items: center; 
+}
+
+#c {
+  position: fixed;
+  z-index: -1;
+}
+
+.bg-controller {
+  opacity: 0.07;
+  color: #d3d3d394;
+  position: fixed;
+  bottom: 2em;
+  left: 50%;
+  width: 40%;
+  transform: translate(-50%, -50%);
+  margin: 0 auto;
+}
+
+.slidecontainer {
+  width: 100%;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 25px;
+  background: #d3d3d394;
+  outline: none;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.bg-controller:hover {
+  opacity: 0.7;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 25px;
+  height: 25px;
+  background: #000000;
+  cursor: pointer; /* Cursor on hover */
+}
+
+.slider::-moz-range-thumb {
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #4CAF50; /* Green background */
+  cursor: pointer; /* Cursor on hover */
 }

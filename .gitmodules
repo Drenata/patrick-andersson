@@ -1,0 +1,3 @@
+[submodule "mandelbrot-webgl"]
+	path = mandelbrot-webgl
+	url = https://github.com/Drenata/mandelbrot-webgl.git
