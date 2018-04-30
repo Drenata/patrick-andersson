@@ -10,11 +10,15 @@ class Interval {
   }
 
   sample(t) {
-    return (((t + this.displacement) % this.intervalLength) + this.a) % this.b;
+    return ((t + this.displacement) % this.intervalLength) + this.a;
   }
 
   static sample(t, a, b, displacement) {
-    return (((t + displacement) % (b - a)) + a) % b;
+    return ((t + displacement) % (b - a)) + a;
+  }
+
+  static sampleReverse(t, a, b, displacement) {
+    return b - this.sample(t, a, b, displacement);
   }
 
 }
