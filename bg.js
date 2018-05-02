@@ -55,7 +55,8 @@ class BGController {
         this.addSlider(0, 1, sphere.rotate, "rotate-sphere", e => sphere.setRotate(parseInt(e.srcElement.value)));
         return sphere;
       case 2:
-        const newC = new NewC();
+        const newC = new Rain();
+        this.addSlider(1, 500, 15, "number-of-raindrops", e => newC.setNumRainDrops(parseInt(e.srcElement.value)));
         return newC;
       default: this.bg = 0;
     }
