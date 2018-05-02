@@ -10,7 +10,7 @@ function onResize(event) {
 
 class BGController {
   constructor() {
-    this.numBGs = 2;
+    this.numBGs = 3;
     this.bg = Math.floor(Math.random() * this.numBGs);
   }
 
@@ -54,6 +54,9 @@ class BGController {
         this.addSlider(20, 130, sphere.numPoints, "number-of-points", e => sphere.setNumPoints(parseInt(e.srcElement.value)));
         this.addSlider(0, 1, sphere.rotate, "rotate-sphere", e => sphere.setRotate(parseInt(e.srcElement.value)));
         return sphere;
+      case 2:
+        const newC = new NewC();
+        return newC;
       default: this.bg = 0;
     }
   }

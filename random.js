@@ -20,7 +20,7 @@ class Random {
   /**
    * Returns a pseudo-random floating point number in range [0, 1).
    */
-  nextFloat(opt_minOrMax, opt_max) {
+  nextFloat() {
     // We know that result of next() will be 1 to 2147483646 (inclusive).
     return (this.next() - 1) / 2147483646;
   }

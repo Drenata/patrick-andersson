@@ -46,8 +46,10 @@ class Sphere {
         const dist = Math.abs(bx);
         const mapped = 1 / (1 + Math.exp( (1/100) * (dist - 450) ));
 
-        cx.fillStyle = Color.linearInterpolate(this.color2, this.color1, mapped);
-        cx.fillRect(bx, by, 15, 15);
+        if (bx **2 + by**2 < c.width**2 + c.height**2) {
+          cx.fillStyle = Color.linearInterpolate(this.color2, this.color1, mapped);
+          cx.fillRect(bx, by, 15, 15);
+        }
       }
     }
 
