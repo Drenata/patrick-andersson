@@ -8,9 +8,18 @@ function onResize(event) {
   c.height = window.innerHeight;
 }
 
+const con = document.getElementsByClassName('content')[0];
+
+const mc = new Hammer(con);
+mc.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+
+// listen to events...
+mc.on("panleft panright panup pandown tap press", function(ev) {
+    console.log(ev);
+});
 class BGController {
   constructor() {
-    this.numBGs = 3;
+    this.numBGs = 4;
     this.bg = Math.floor(Math.random() * this.numBGs);
   }
 
@@ -58,6 +67,10 @@ class BGController {
         const newC = new Rain();
         this.addSlider(1, 500, 15, "number-of-raindrops", e => newC.setNumRainDrops(parseInt(e.srcElement.value)));
         return newC;
+      case 3:
+        const lSystem = new LSystem();
+        this.addSlider(1, 30, 1, "evolution-step", e => lSystem.evolveTo(parseInt(e.srcElement.value)));
+        return lSystem;
       default: this.bg = 0;
     }
   }
@@ -85,7 +98,6 @@ function main() {
   now = Date.now();
   acc += (now - last) / 1000;
   last = now;
-  cx.clearRect(0, 0, c.width, c.height);
 
   bg.draw(acc)
 }
