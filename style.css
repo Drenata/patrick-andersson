@@ -1,4 +1,4 @@
-*{
+* {
   font-family: sans-serif;
   padding: 0;
   margin: 0;
@@ -10,20 +10,20 @@ html,body, #root {
   overflow: hidden;
 }
 
-body{
-  background: rgb(0, 0, 0)
+body {
+  background: rgb(0, 0, 0);
 }
 
-a{
+a {
   text-decoration: none;
   color: #fff;
 }
 
-a:hover{
+a:hover {
   color: rgba(255, 255, 255, 0.33);
 }
 
-.content{
+.content {
   display: flex;
   height: 100%;
   font-size: 4em;
@@ -32,7 +32,7 @@ a:hover{
   align-items: center;
 }
 
-.projects{
+.projects {
   position: absolute;
   right: 1em;
   bottom: 1em;
@@ -49,20 +49,20 @@ a:hover{
 }
 
 .bg-controller {
-  opacity: 0.1;
-  color: #d3d3d394;
   position: fixed;
-  bottom: 10px;
-  left: 50%;
-  width: 40%;
-  transform: translate(-50%, 0);
-  margin: 0 auto;
+  top: 0px;
+  left: 25px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  pointer-events: none;
 }
 
 #next-bg {
   position: fixed;
-  top: 10px;
-  right: 10px;
+  left: 68px;
+  bottom: 10px;
   height: 48px;
   width: 48px;
   background-color: rgba(255, 255, 255, 0.1);
@@ -70,8 +70,8 @@ a:hover{
 
 #prev-bg {
   position: fixed;
-  top: 10px;
-  right: 68px;
+  bottom: 10px;
+  left: 10px;
   height: 48px;
   width: 48px;
   background-color: rgba(255, 255, 255, 0.1);
@@ -89,21 +89,34 @@ a:hover{
   fill: rgba(0, 0, 0, 1);
 }
 
-.slidecontainer {
-  width: 100%;
+.slidercontainer {
+  height: 60vh;
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: row;
+}
+
+.slider-div {
+  width: 25px;
+  padding-right: 25px;
 }
 
 .slider {
   -webkit-appearance: none;
-  width: 100%;
+  width: 50vh;
   height: 25px;
   background: #d3d3d394;
   outline: none;
   -webkit-transition: .2s;
   transition: opacity .2s;
+  transform-origin: 50vh 0px;
+  transform: rotate(-90deg) translate(25px,-50vh);
+  opacity: 0.2;
+  pointer-events: auto;
+  color: #d3d3d394;
 }
 
-.bg-controller:hover {
+.slider:hover {
   opacity: 0.7;
 }
 

@@ -56,8 +56,9 @@ export class Rain implements IBackground {
       const x = this.random.nextFloat() * this.width;
       const y = this.random.nextFloat() * this.height;
 
-      for (let i = 0; i < y; i+= 30) {
-        this.context.fillRect(x, i, 1, Math.min(this.height / 5, y - i));
+      const dropSpeed = 30;
+      for (let i = -10; i < y; i+= dropSpeed) {
+        this.context.fillRect(x, i, 2, Math.min(this.height / 10, y - i));
         yield;
       }
 
@@ -65,6 +66,7 @@ export class Rain implements IBackground {
       const speed = size / 60;
       for (let i = 0; i < size; i+= speed) {
         this.context.strokeStyle = Color.linearInterpolate(this.beginningColor, this.endColor, i / size).toString();
+        this.context.lineWidth = 2;
         this.context.beginPath();
         this.context.arc(x, y, i / 2, 0, 2 * Math.PI);
         this.context.stroke();
@@ -76,7 +78,7 @@ export class Rain implements IBackground {
       this.width = width;
       this.height = height;
       this.context = context;
-      this.context.fillStyle = "rgba(4, 57, 142, 0.7)";
+      this.context.fillStyle = "rgba(4, 57, 142, 1.0)";
       this.context.clearRect(0, 0, width, height);
 
       for (let i = 0; i < this.drops.length; i++) {

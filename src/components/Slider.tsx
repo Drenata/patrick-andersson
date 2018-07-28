@@ -30,17 +30,19 @@ export class Slider extends React.Component<SliderProps, SliderState> {
 
   render() {
     return (
-      <input
-        key={this.props.id}
-        type="range"
-        min={this.props.min}
-        max={this.props.max}
-        value={this.state.value}
-        className="slider"
-        id={this.props.id}
-        onInput={this.props.onInput}
-        onChange={this.onChange}
-      />);
+      <div className="slider-div">
+        <input
+          key={this.props.id}
+          type="range"
+          min={this.props.min}
+          max={this.props.max}
+          value={this.state.value}
+          className="slider"
+          id={this.props.id}
+          onInput={this.props.onInput}
+          onChange={this.onChange}
+        />
+      </div>);
   }
 
 }
