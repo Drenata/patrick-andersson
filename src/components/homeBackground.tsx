@@ -17,6 +17,7 @@ interface HomeBackgroundState {
 export class HomeBackground extends React.Component<HomeBackgroundProps, HomeBackgroundState> {
   canvas: React.RefObject<HTMLCanvasElement>;
   numBGs = 3;
+  accum = 0;
 
   constructor(props: HomeBackgroundProps) {
     super(props);
@@ -44,15 +45,19 @@ export class HomeBackground extends React.Component<HomeBackgroundProps, HomeBac
   }
 
   update(time: number) {
-    // TODO do not use real time, use accumulated time.
+    // do not use real time, use accumulated time.
     // E.g. slow down the simulation if we are lagging
     // instead of actually lagging
-    this.state.background.draw(
-      time / 1000,
-      this.canvas.current!.getContext('2d')!,
-      this.canvas.current!.width,
-      this.canvas.current!.height
-    );
+    this.accum += 1/60;
+    const canvas = this.canvas.current;
+    if (canvas) {
+      this.state.background.draw(
+        this.accum,
+        canvas.getContext('2d')!,
+        this.canvas.current!.width,
+        this.canvas.current!.height
+      );
+    }
     requestAnimationFrame(t => this.update(t));
   }
 
@@ -97,6 +102,8 @@ export class HomeBackground extends React.Component<HomeBackgroundProps, HomeBac
 
   render() {
     return [
+      <div><a href="https://github.com/Drenata">Github</a></div>,
+      <div><a href="https://www.linkedin.com/in/patrick-andersson-8755bab4/">LinkedIn</a></div>,
       <canvas
         id="c"
         ref={this.canvas}
