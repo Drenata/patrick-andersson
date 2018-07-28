@@ -1,5 +1,7 @@
 import * as React from "react";
+import { Link, Route } from 'react-router-dom';
 import { HomeBackground } from './homeBackground';
+import { LSystem } from './LSystem';
 
 interface HomeProps {};
 interface HomeState {};
@@ -16,13 +18,13 @@ export class Home extends React.Component<HomeProps, HomeState> {
   render() {
     return [
       <div className="content">
-        <HomeBackground />
-        <div><a href="https://github.com/Drenata">Github</a></div>
-        <div><a href="https://www.linkedin.com/in/patrick-andersson-8755bab4/">LinkedIn</a></div>
+        <Route exact path="/" component={HomeBackground} />
+        <Route path="/lsystem" component={LSystem} />
       </div>,
       <div className="projects">
+        <div><Link to="/">Start</Link></div>
         <div><a href="/mandelbrot-webgl">Mandelbrot</a></div>
-        <div><a href="/lsystem">L-system</a></div>
+        <div><Link to="/lsystem">L-system</Link></div>
       </div>
     ];
   }
