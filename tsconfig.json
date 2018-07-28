@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+      "outDir": "./dist/",
+      "target": "es5",
+      "sourceMap": true,
+      "jsx": "react",
+      "rootDir": "src",
+      "module": "commonjs",
+      "noImplicitReturns": true,
+      "noImplicitThis": true,
+      "noImplicitAny": true,
+      "strictNullChecks": true
+    },
+  }

@@ -1,0 +1,31 @@
+{
+  "name": "patrick-andersson",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bg.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Drenata/patrick-andersson.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Drenata/patrick-andersson/issues"
+  },
+  "homepage": "https://github.com/Drenata/patrick-andersson#readme",
+  "dependencies": {
+    "@types/react": "^16.4.7",
+    "@types/react-dom": "^16.0.6",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "tslint": "^5.11.0"
+  },
+  "devDependencies": {
+    "awesome-typescript-loader": "^5.2.0",
+    "source-map-loader": "^0.2.3",
+    "typescript": "^2.9.2"
+  }
+}

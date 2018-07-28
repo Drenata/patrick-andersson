@@ -6,7 +6,7 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-    
+
       gtag('config', 'UA-118819616-1');
     </script>
 
@@ -34,47 +34,15 @@
   </head>
   <body>
 
-
-  <div class="content">
-    <canvas id="c"></canvas>
-    <div><a href="https://github.com/Drenata">Github</a></div>
-    <div><a href="https://www.linkedin.com/in/patrick-andersson-8755bab4/">LinkedIn</a></div>
-  </div>
-
-  <div id="next-bg">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" height="48" viewBox="0 0 24 24" width="48">
-      <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-      <path d="M0 0h24v24H0z" fill="none"/>
-    </svg>
-  </div>
-
-  <div id="prev-bg">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" height="48" viewBox="0 0 24 24" width="48">
-      <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
-      <path d="M0 0h24v24H0z" fill="none"/>
-    </svg>
-  </div>
+  <div id="root"></div>
 
   <div class="bg-controller">
     <div class="slidecontainer">
     </div>
   </div>
 
-  <div class="projects">
-    <div><a href="/mandelbrot-webgl">Mandelbrot</a></div>
-  </div>
-
   </body>
-  <script src="https://hammerjs.github.io/dist/hammer.js"></script>
-  <script src="util.js"></script>
-  <script src="color.js"></script>
-  <script src="random.js"></script>
-  <script src="turtle.js"></script>
-
-  <script src="lSystem.js"></script>
-  <script src="thirdPolynomialBars.js"></script>
-  <script src="sphere.js"></script>
-  <script src="rain.js"></script>
-
-  <script src="bg.js"></script>
+  <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+  <script src="./dist/bundle.js"></script>
 </html>

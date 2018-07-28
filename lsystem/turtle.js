@@ -29,7 +29,7 @@ class TurtleGraphics {
     popState() {
       [this.location, this.orientation] = this.stateStack.pop();
     }
-  
+
     reset() {
       cx.setTransform(1, 0, 0, 1, 0, 0);
       cx.clearRect(0, 0, c.width, c.height);
