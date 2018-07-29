@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Link, Route } from 'react-router-dom';
 import { HomeBackground } from './homeBackground';
-import { LSystem } from './LSystem';
+import { LSystemContainer } from './LSystem';
 
 interface HomeProps {};
 interface HomeState {};
@@ -18,8 +18,8 @@ export class Home extends React.Component<HomeProps, HomeState> {
   render() {
     return [
       <div className="content">
-        <Route exact path="/" component={HomeBackground} />
-        <Route path="/lsystem" component={LSystem} />
+        <Route exact={true}  path="/" component={HomeBackground} />
+        <Route path="/lsystem" component={LSystemContainer} />
       </div>,
       <div className="projects">
         <div><Link to="/">Start</Link></div>

@@ -57,8 +57,8 @@ export class HomeBackground extends React.Component<HomeBackgroundProps, HomeBac
         this.canvas.current!.width,
         this.canvas.current!.height
       );
+      requestAnimationFrame(t => this.update(t));
     }
-    requestAnimationFrame(t => this.update(t));
   }
 
   next() {
