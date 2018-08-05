@@ -79,7 +79,6 @@ export class TurtleGraphics {
     const turtle = new TurtleGraphics();
     for (let i = 0; i < input.length; i++) {
       const symbol = input[i];
-      console.log(symbol, commandMap[symbol]);
       for (const command of commandMap[symbol]) {
         turtle.act(command);
       }
