@@ -3,6 +3,7 @@ import { IBackground } from '../backgrounds/IBackground';
 import { Rain } from '../backgrounds/Rain';
 import { Sphere } from '../backgrounds/Sphere';
 import { ThirdPolynomialBars } from '../backgrounds/ThirdPolynomialBars';
+import { NextButton, PreviousButton } from './buttons';
 
 interface HomeBackgroundProps {};
 interface HomeBackgroundState {
@@ -102,35 +103,21 @@ export class HomeBackground extends React.Component<HomeBackgroundProps, HomeBac
 
   render() {
     return [
-      <div><a href="https://github.com/Drenata">Github</a></div>,
-      <div><a href="https://www.linkedin.com/in/patrick-andersson-8755bab4/">LinkedIn</a></div>,
+      <div className="content">
+        <div><a href="https://github.com/Drenata">Github</a></div>
+        <div><a href="https://www.linkedin.com/in/patrick-andersson-8755bab4/">LinkedIn</a></div>
+      </div>,
       <canvas
         id="c"
         ref={this.canvas}
         width={this.state.width}
         height={this.state.height}
       />,
-      <div
-        id="next-bg"
-        onClick={this.next}
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" height="48" viewBox="0 0 24 24" width="48">
-          <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-          <path d="M0 0h24v24H0z" fill="none"/>
-        </svg>
-      </div>,
-      <div
-        id="prev-bg"
-        onClick={this.prev}
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" height="48" viewBox="0 0 24 24" width="48">
-          <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
-          <path d="M0 0h24v24H0z" fill="none"/>
-        </svg>
-      </div>,
+      <NextButton onClick={this.next} />,
+      <PreviousButton onClick={this.prev} />,
       ( this.state.background &&
         <div className="bg-controller">
-          { this.state.background.optionControls() }
+          <this.state.background.optionControls />
         </div>
       )
     ];

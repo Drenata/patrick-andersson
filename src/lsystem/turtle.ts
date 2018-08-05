@@ -1,6 +1,22 @@
 import { BufferAttribute, BufferGeometry, LineBasicMaterial, LineSegments, Path } from 'three';
 import { Color } from '../color';
 
+export enum TurtleCommandTypes {
+  MOVE = "Move",
+  ROTATE = "Rotate",
+  PUSH = "Push state",
+  POP = "Pop state"
+}
+
+export interface TurtleCommand {
+  command: TurtleCommandTypes;
+  argument: string;
+}
+
+export interface ITurtleCommands {
+  [symbol: string]: TurtleCommand[]
+}
+
 export class TurtleGraphics {
   location: [number, number];
   orientation: number;
@@ -13,7 +29,7 @@ export class TurtleGraphics {
 
   constructor() {
     this.location = [0, 0];
-    this.orientation = 0;
+    this.orientation = 90 * 0.0174532925;
     this.color = new Color(255, 0, 0, 1);
     this.width = 1;
     this.on = true;
@@ -31,7 +47,7 @@ export class TurtleGraphics {
   }
 
   rotate(degrees: number) {
-    this.orientation += degrees;
+    this.orientation += degrees * 0.0174532925;
   }
 
   changeDrawState(enabled: boolean) {
@@ -50,11 +66,23 @@ export class TurtleGraphics {
     }
   }
 
-  static getLine(command: string, commandMap: any) {
+  act(command: TurtleCommand) {
+    switch (command.command) {
+      case TurtleCommandTypes.MOVE:   return this.move(parseFloat(command.argument));
+      case TurtleCommandTypes.ROTATE: return this.rotate(parseFloat(command.argument));
+      case TurtleCommandTypes.PUSH:   return this.pushState();
+      case TurtleCommandTypes.POP:    return this.popState();
+    }
+  }
+
+  static getLine(input: string, commandMap: ITurtleCommands) {
     const turtle = new TurtleGraphics();
-    for (let i = 0; i < command.length; i++) {
-      const symbol = command[i];
-      commandMap[symbol](turtle);
+    for (let i = 0; i < input.length; i++) {
+      const symbol = input[i];
+      console.log(symbol, commandMap[symbol]);
+      for (const command of commandMap[symbol]) {
+        turtle.act(command);
+      }
     }
 
     const geometry = new BufferGeometry().addAttribute("position", new BufferAttribute(new Float32Array(turtle.positions), 3));

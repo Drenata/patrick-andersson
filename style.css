@@ -3,6 +3,7 @@
   padding: 0;
   margin: 0;
   line-height: 1;
+  color: #b8b7ad;
   -webkit-user-select: none; /* webkit (safari, chrome) browsers */
   -moz-user-select: none; /* mozilla browsers */
   -khtml-user-select: none; /* webkit (konqueror) browsers */
@@ -20,7 +21,11 @@ body {
 
 a {
   text-decoration: none;
-  color: #fff;
+  color: #b8b7ad;
+}
+
+textarea {
+  resize: none;
 }
 
 .content {
@@ -46,6 +51,8 @@ a {
 #c {
   position: fixed;
   z-index: -1;
+  top: 0;
+  left: 0;
 }
 
 .bg-controller {
@@ -59,33 +66,43 @@ a {
   pointer-events: none;
 }
 
-#next-bg {
+.normal-btn {
+  cursor: pointer;
   position: fixed;
-  left: 116px;
-  bottom: 10px;
-  height: 96px;
-  width: 96px;
-  background-color: rgba(255, 255, 255, 0.45);
+  height: 56px;
+  width:  56px;
+  background-color: #373a47cc;
 }
 
-#prev-bg {
-  position: fixed;
-  bottom: 10px;
+#next-btn {
+  left: 96px;
+  bottom: 20px;
+}
+
+#prev-btn,
+#reset-btn {
+  bottom: 20px;
+  left: 20px;
+}
+
+#hamburger-btn {
+  top: 10px;
   left: 10px;
-  height: 96px;
-  width: 96px;
-  background-color: rgba(255, 255, 255, 0.45);
 }
 
-
-#next-bg > svg,
-#prev-bg > svg {
+.normal-btn > svg {
   width: 100%;
   height: auto;
 }
 
-#next-bg:active > svg, #prev-bg:active > svg {
+.normal-btn:active > svg {
   fill: rgba(0, 0, 0, 1);
+}
+
+.example-l-system {
+  outline: auto !important;
+  text-align: center;
+  margin: 0.8em 0;
 }
 
 .slidercontainer {
@@ -104,7 +121,7 @@ a {
   -webkit-appearance: none;
   width: 50vh;
   height: 25px;
-  background: #d3d3d394;
+  background: #373a47cc;
   outline: none;
   opacity: 0.7;
   -webkit-transition: .2s;
@@ -112,7 +129,7 @@ a {
   transform-origin: 50vh 0px;
   transform: rotate(-90deg) translate(25px,-50vh);
   pointer-events: auto;
-  color: #d3d3d394;
+  color: #373a47cc;
 }
 
 .slider::-webkit-slider-thumb {
@@ -130,31 +147,155 @@ a {
   cursor: pointer;
 }
 
-/**************
-    Pseudo
-***************/
+.production-rule, .visualization-rule {
+  font-family: monospace;
+}
+
+.production-rule input {
+  width: 70%;
+}
+
+.visualization-rule select {
+  background-color: #0000;
+  margin-right: 0.3em;
+}
+
+.visualization-rule a {
+  line-height: 0.8em;
+}
+
+.visualization-command::before {
+  content: " 🐢 ";
+}
+
+.visualization-command input[type=text] {
+  width: 1.8em;
+  text-align: center;
+  padding: 0.48em 0.4em 0.32em 0.4em !important;
+}
+
+.visualization-command {
+  display: inline-block;
+  padding-left: 0.2em;
+}
+
+.visualization-rule-controls {
+  display: inline-block;
+  padding-left: 0.2em;
+}
+
+.visualization-rule-controls a {
+  padding: 0 0.1em;
+}
+
+/*****************
+    Side bar
+*****************/
+
+.bm-menu {
+  padding: 2.5em 1.5em 0;
+  font-size: 1.15em;
+  background-color: #373a47;
+}
+
+.bm-burger-button {
+  position: fixed;
+  height: 56px;
+  width:  56px;
+  left: 20px;
+  top:  20px;
+}
+
+.bm-burger-bars {
+  background: #373a47cc;
+}
+
+.bm-cross {
+  background-color: #b8b7ad;
+}
+
+.bm-item {
+  padding: 0.8em;
+}
+
+.bm-item input {
+  padding: 0.4em;
+  margin: 0.2em 0;
+  border: none;
+  background-color: #373a47;
+  border: 2px solid #77797A;
+  border-radius: 5px;
+  vertical-align: baseline
+}
+
+.bm-item select {
+  border: 2px solid #77797A;
+  border-radius: 5px;
+  padding: 0.4em;
+  margin: 0.2em 0.2em 0.2em 0;
+}
+
+.bm-item label {
+  display: block;
+  padding-bottom: 0.4em;
+  font-weight: bold;
+}
+
+a.bm-item {
+  outline: auto !important;
+  text-align: center;
+}
+
+.bm-cross-button {
+  margin-right: 0.6em;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  select:focus,
+  textarea:focus,
+  input:focus {
+    font-size: 16px;
+  }
+}
+
+/*****************
+  Pseudo classes
+******************/
 
 /* hover */
 
 a:hover {
-  color: rgba(255, 255, 255, 0.33);
+  color: #b8b7ad4d;
 }
 
-#next-bg:hover, #prev-bg:hover {
-  background-color: rgba(255, 255, 255, 0.8);
+.normal-btn:hover {
+  background-color: #373a4799;
 }
 
 @media (hover: none) {
-  #next-bg:hover, #prev-bg:hover {
-    background-color: rgba(255, 255, 255, 0.45);
+  .normal-btn:hover {
+    background-color: #373a47cc;
   }
 
   a:hover {
-    color: #fff;
+    color: #b8b7ad;
   }
 }
 
 /* active */
-#next-bg:active , #prev-bg:active {
-  background-color: rgba(255, 255, 255, 1);
+a:active {
+  color: #fff;
+}
+
+.normal-btn:active {
+  background-color: #373a47;
+}
+
+.bm-burger-bars:active {
+  background: #373a47;
+}
+
+input:focus, select:focus {
+  outline: 0;
+  border: 2px solid white !important;
 }

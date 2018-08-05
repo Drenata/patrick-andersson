@@ -18,10 +18,12 @@
   "homepage": "https://github.com/Drenata/patrick-andersson#readme",
   "dependencies": {
     "@types/react": "^16.4.7",
+    "@types/react-burger-menu": "^2.2.0",
     "@types/react-dom": "^16.0.6",
     "@types/react-router-dom": "^4.3.0",
     "@types/three": "^0.92.14",
     "react": "^16.4.1",
+    "react-burger-menu": "^2.5.2",
     "react-dom": "^16.4.1",
     "react-router-dom": "^4.3.1",
     "three": "^0.94.0",
