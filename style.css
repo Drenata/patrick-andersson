@@ -17,6 +17,7 @@ html,body, #root {
 
 body {
   background: rgb(0, 0, 0);
+  font-size: 16px;
 }
 
 a {
@@ -119,17 +120,20 @@ textarea {
 
 .slider {
   -webkit-appearance: none;
-  width: 50vh;
-  height: 25px;
   background: #373a47cc;
   outline: none;
   opacity: 0.7;
   -webkit-transition: .2s;
   transition: opacity .2s;
-  transform-origin: 50vh 0px;
-  transform: rotate(-90deg) translate(25px,-50vh);
   pointer-events: auto;
   color: #373a47cc;
+}
+
+.slider-div .slider {
+  width: 50vh;
+  height: 25px;
+  transform-origin: 50vh 0px;
+  transform: rotate(-90deg) translate(25px,-50vh);
 }
 
 .slider::-webkit-slider-thumb {
@@ -165,7 +169,7 @@ textarea {
 }
 
 .visualization-command::before {
-  content: " 🐢 ";
+  content: " → ";
 }
 
 .visualization-command input[type=text] {
@@ -250,12 +254,17 @@ a.bm-item {
   margin-right: 0.6em;
 }
 
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-  select:focus,
-  textarea:focus,
-  input:focus {
-    font-size: 16px;
-  }
+.bm-item input[type=range]{
+  width: 70%;
+  padding: 0;
+}
+
+.bm-item h2 {
+  padding-bottom: 0.3em;
+}
+
+h1.bm-item {
+  margin: 0;
 }
 
 /*****************

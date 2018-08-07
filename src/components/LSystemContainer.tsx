@@ -22,11 +22,11 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
   camera: PerspectiveCamera;
   renderer: THREE.Renderer;
   canvas: HTMLCanvasElement;
-  cube: THREE.Mesh;
   panZoom: any;
   level: number;
   line: Line;
   lSystem: LSystem;
+  active = true;
 
   constructor(props: LSystemProps) {
     super(props);
@@ -113,7 +113,7 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
   }
 
   update() {
-    if (this.canvas) {
+    if (this.active && this.canvas) {
       requestAnimationFrame(() => this.update());
       this.renderer.render( this.scene, this.camera );
     }
@@ -145,6 +145,7 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
     window.removeEventListener('load', this.onWindowResize);
     this.canvas.remove();
     this.panZoom.dispose();
+    this.active = false;
   }
 
   selectExample(example: number) {
@@ -240,7 +241,7 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
                   return newState;
                 });
               }}
-            >➖</a>
+            >-</a>
           }
           <a onClick={() => {
             this.setState(prevState => {
@@ -251,7 +252,7 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
               });
               return newState;
             });
-          }}>➕</a>
+          }}>+</a>
         </div>
       </div>
     );

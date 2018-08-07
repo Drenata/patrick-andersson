@@ -6,6 +6,10 @@
       "jsx": "react",
       "rootDir": "src",
       "module": "commonjs",
+      "lib": [
+        "es6",
+        "dom"
+      ],
       "noImplicitReturns": true,
       "noImplicitThis": true,
       "noImplicitAny": true,
