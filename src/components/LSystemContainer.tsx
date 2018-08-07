@@ -349,7 +349,10 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
           <this.getVisualizationInput />
         </div>
         <a onClick={() => this.loadLSystem()}>Load</a>
-        <label>Examples</label>
+        <div>
+          <br />
+          <label>Examples</label>
+        </div>
         <a className={"example-l-system"} onClick={() => this.selectExample(0)}>Fractal (binary) tree</a>
         <a className={"example-l-system"} onClick={() => this.selectExample(1)}>Koch curve</a>
         <a className={"example-l-system"} onClick={() => this.selectExample(2)}>Sierpinski triangle</a>
