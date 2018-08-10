@@ -48,127 +48,187 @@ export class LSystem {
 
 }
 
-export function createExample(example: number): [string[], IProductionRules, string, ITurtleCommands] {
-  switch (example) {
-    case 1:
-      return [
-        ['F', '+', '-'],
-        {
-          'F': 'F+F-F-F+F',
-          '+': '+',
-          '-': '-',
-        },
-        'F',{
-          'F': [{command: TurtleCommandTypes.MOVE, argument: '1'}],
-          '+': [{command: TurtleCommandTypes.ROTATE, argument: '90'}],
-          '-': [{command: TurtleCommandTypes.ROTATE, argument: '-90'}],
-        }
-      ];
-    case 2:
-      return [
-        ['F', 'G', '+', '-'],
-        {
-          'F': 'F-G+F+G-F',
-          'G': 'GG',
-          '+': '+',
-          '-': '-',
-        },
-        'F-G-G',{
-          'F': [{command: TurtleCommandTypes.MOVE, argument: '1'}],
-          'G': [{command: TurtleCommandTypes.MOVE, argument: '1'}],
-          '+': [{command: TurtleCommandTypes.ROTATE, argument: '120'}],
-          '-': [{command: TurtleCommandTypes.ROTATE, argument: '-120'}],
-        }
-      ];
-    case 3:
-      return [
-        ['A', 'B', '+', '-'],
-        {
-          'A': 'B-A-B',
-          'B': 'A+B+A',
-          '+': '+',
-          '-': '-',
-        },
-        'A',{
-          'A': [{command: TurtleCommandTypes.MOVE, argument: '1'}],
-          'B': [{command: TurtleCommandTypes.MOVE, argument: '1'}],
-          '+': [{command: TurtleCommandTypes.ROTATE, argument: '60'}],
-          '-': [{command: TurtleCommandTypes.ROTATE, argument: '-60'}],
-        }
-      ];
-    case 4:
-      return [
-        ['X', 'Y', 'F', '+', '-'],
-        {
-          'X': 'X+YF+',
-          'Y': '-FX-Y',
-          'F': 'F',
-          '+': '+',
-          '-': '-',
-        },
-        'FX',{
-          'X': [{command: TurtleCommandTypes.MOVE, argument: '0'}],
-          'Y': [{command: TurtleCommandTypes.MOVE, argument: '0'}],
-          'F': [{command: TurtleCommandTypes.MOVE, argument: '1'}],
-          '+': [{command: TurtleCommandTypes.ROTATE, argument: '90'}],
-          '-': [{command: TurtleCommandTypes.ROTATE, argument: '-90'}],
-        }
-      ];
-    case 5:
-      return [
-        ['F', '+', '-'],
-        {
-          'F': '+F--F+',
-          '+': '+',
-          '-': '-',
-        },
-        'F',{
-          'F': [{command: TurtleCommandTypes.MOVE, argument: '1'}],
-          '+': [{command: TurtleCommandTypes.ROTATE, argument: '45'}],
-          '-': [{command: TurtleCommandTypes.ROTATE, argument: '-45'}],
-        }
-      ];
-    case 6:
-      return [
-        ['X', 'F', '+', '-', '[', ']'],
-        {
-          'X': 'F+[[X]-X]-F[-FX]+X',
-          'F': 'FF',
-          '+': '+',
-          '-': '-',
-          '[': '[',
-          ']': ']',
-        },
-        'X',{
-          'F': [{command: TurtleCommandTypes.MOVE, argument: '1'}],
-          'X': [{command: TurtleCommandTypes.MOVE, argument: '0'}],
-          '+': [{command: TurtleCommandTypes.ROTATE, argument: '25'}],
-          '-': [{command: TurtleCommandTypes.ROTATE, argument: '-25'}],
-          '[': [{command: TurtleCommandTypes.PUSH, argument: ''}],
-          ']': [{command: TurtleCommandTypes.POP, argument: ''}],
-        }
-      ];
-    default:
-      return [
-        ['0', '1', '[', ']'],
-        {
-          '0': '1[0]0',
-          '1': '11',
-          '[': '[',
-          ']': ']'
-        },
-        '0',{
-          '0': [{command: TurtleCommandTypes.MOVE, argument: '1'}],
-          '1': [{command: TurtleCommandTypes.MOVE, argument: '1'}],
-          '[': [
-            {command: TurtleCommandTypes.PUSH, argument: ''},
-            {command: TurtleCommandTypes.ROTATE, argument: '45'}
-          ],
-          ']': [
-            {command: TurtleCommandTypes.POP, argument: ''},
-            {command: TurtleCommandTypes.ROTATE, argument: '-45'}
-          ],
-        }
-      ];
+export const examples: {
+  name: string;
+  alphabet: string[];
+  productionRules: IProductionRules;
+  axiom: string;
+  visualization: ITurtleCommands;
+}[] = [
+  {
+    name: "Fractal (binary) tree",
+    alphabet: ['0', '1', '[', ']'],
+    productionRules: {
+      '0': '1[0]0',
+      '1': '11',
+      '[': '[',
+      ']': ']'
+    },
+    axiom: '0',
+    visualization: {
+      '0': [{ command: TurtleCommandTypes.MOVE, argument: '1' }],
+      '1': [{ command: TurtleCommandTypes.MOVE, argument: '1' }],
+      '[': [
+        { command: TurtleCommandTypes.PUSH, argument: '' },
+        { command: TurtleCommandTypes.ROTATE, argument: '45' }
+      ],
+      ']': [
+        { command: TurtleCommandTypes.POP, argument: '' },
+        { command: TurtleCommandTypes.ROTATE, argument: '-45' }
+      ],
+    }
+  },
+  {
+    name: "Koch snowflake",
+    alphabet: ['F', '+', '-'],
+    productionRules: {
+      'F': 'F+F--F+F',
+      '+': '+',
+      '-': '-',
+    },
+    axiom: 'F--F--F',
+    visualization: {
+      'F': [{ command: TurtleCommandTypes.MOVE, argument: '1' }],
+      '+': [{ command: TurtleCommandTypes.ROTATE, argument: '60' }],
+      '-': [{ command: TurtleCommandTypes.ROTATE, argument: '-60' }],
+    }
+  },
+  {
+    name: "Koch curve",
+    alphabet: ['F', '+', '-'],
+    productionRules: {
+      'F': 'F+F-F-F+F',
+      '+': '+',
+      '-': '-',
+    },
+    axiom: 'F',
+    visualization: {
+      'F': [{ command: TurtleCommandTypes.MOVE, argument: '1' }],
+      '+': [{ command: TurtleCommandTypes.ROTATE, argument: '90' }],
+      '-': [{ command: TurtleCommandTypes.ROTATE, argument: '-90' }],
+    }
+  },
+  {
+    name: "Cesàro fractal",
+    alphabet: ['F', '+', '-'],
+    productionRules: {
+      'F': 'F+F--F+F',
+      '+': '+',
+      '-': '-',
+    },
+    axiom: 'F--F',
+    visualization: {
+      'F': [{ command: TurtleCommandTypes.MOVE, argument: '1' }],
+      '+': [{ command: TurtleCommandTypes.ROTATE, argument: '85' }],
+      '-': [{ command: TurtleCommandTypes.ROTATE, argument: '-85' }],
+    }
+  },
+  {
+    name: "Sierpinski triangle",
+    alphabet: ['F', 'G', '+', '-', 'R'],
+    productionRules: {
+      'F': 'F-G+F+G-F',
+      'G': 'GG',
+      '+': '+',
+      '-': '-',
+      'R': 'R'
+    },
+    axiom: 'RF-G-G',
+    visualization: {
+      'F': [{ command: TurtleCommandTypes.MOVE, argument: '1' }],
+      'G': [{ command: TurtleCommandTypes.MOVE, argument: '1' }],
+      '+': [{ command: TurtleCommandTypes.ROTATE, argument: '120' }],
+      '-': [{ command: TurtleCommandTypes.ROTATE, argument: '-120' }],
+      'R': [{ command: TurtleCommandTypes.ROTATE, argument: '-30' }],
+    }
+  },
+  {
+    name: "Sierpinski triangle (approx)",
+    alphabet: ['A', 'B', '+', '-'],
+    productionRules: {
+      'A': 'B-A-B',
+      'B': 'A+B+A',
+      '+': '+',
+      '-': '-',
+    },
+    axiom: 'A',
+    visualization: {
+      'A': [{ command: TurtleCommandTypes.MOVE, argument: '1' }],
+      'B': [{ command: TurtleCommandTypes.MOVE, argument: '1' }],
+      '+': [{ command: TurtleCommandTypes.ROTATE, argument: '60' }],
+      '-': [{ command: TurtleCommandTypes.ROTATE, argument: '-60' }],
+    }
+  },
+  {
+    name: "Gosper curve",
+    alphabet: ['A', 'B', '+', '-'],
+    productionRules: {
+      'A': 'A-B--B+A++AA+B-',
+      'B': '+A-BB--B-A++A+B',
+      '+': '+',
+      '-': '-',
+    },
+    axiom: 'A',
+    visualization: {
+      'A': [{ command: TurtleCommandTypes.MOVE, argument: '1' }],
+      'B': [{ command: TurtleCommandTypes.MOVE, argument: '1' }],
+      '+': [{ command: TurtleCommandTypes.ROTATE, argument: '60' }],
+      '-': [{ command: TurtleCommandTypes.ROTATE, argument: '-60' }],
+    }
+  },
+  {
+    name: "Dragon curve",
+    alphabet: ['X', 'Y', 'F', '+', '-'],
+    productionRules: {
+      'X': 'X+YF+',
+      'Y': '-FX-Y',
+      'F': 'F',
+      '+': '+',
+      '-': '-',
+    },
+    axiom: 'FX',
+    visualization: {
+      'X': [{ command: TurtleCommandTypes.MOVE, argument: '0' }],
+      'Y': [{ command: TurtleCommandTypes.MOVE, argument: '0' }],
+      'F': [{ command: TurtleCommandTypes.MOVE, argument: '1' }],
+      '+': [{ command: TurtleCommandTypes.ROTATE, argument: '90' }],
+      '-': [{ command: TurtleCommandTypes.ROTATE, argument: '-90' }],
+    }
+  },
+  {
+    name: "Lévy C curve",
+    alphabet: ['F', '+', '-'],
+    productionRules: {
+      'F': '+F--F+',
+      '+': '+',
+      '-': '-',
+    },
+    axiom: 'F',
+    visualization: {
+      'F': [{ command: TurtleCommandTypes.MOVE, argument: '1' }],
+      '+': [{ command: TurtleCommandTypes.ROTATE, argument: '45' }],
+      '-': [{ command: TurtleCommandTypes.ROTATE, argument: '-45' }],
+    }
+  },
+  {
+    name: "Fractal plant",
+    alphabet: ['X', 'F', '+', '-', '[', ']'],
+    productionRules: {
+      'X': 'F+[[X]-X]-F[-FX]+X',
+      'F': 'FF',
+      '+': '+',
+      '-': '-',
+      '[': '[',
+      ']': ']',
+    },
+    axiom: 'X',
+    visualization: {
+      'F': [{ command: TurtleCommandTypes.MOVE, argument: '1' }],
+      'X': [{ command: TurtleCommandTypes.MOVE, argument: '0' }],
+      '+': [{ command: TurtleCommandTypes.ROTATE, argument: '25' }],
+      '-': [{ command: TurtleCommandTypes.ROTATE, argument: '-25' }],
+      '[': [{ command: TurtleCommandTypes.PUSH, argument: '' }],
+      ']': [{ command: TurtleCommandTypes.POP, argument: '' }],
+    }
   }
-}
+];

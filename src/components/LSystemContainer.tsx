@@ -1,7 +1,7 @@
 import * as React from "react";
 import { slide as Menu } from "react-burger-menu";
 import { Line, PerspectiveCamera, Scene, WebGLRenderer } from 'three';
-import { createExample, IProductionRules, LSystem } from '../lsystem/lSystem';
+import { examples, IProductionRules, LSystem } from '../lsystem/lSystem';
 import { ITurtleCommands, TurtleCommandTypes } from '../lsystem/turtle';
 import { NextButton, ResetButton } from './buttons';
 
@@ -104,7 +104,7 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
       .getElementById("canvas-div")!
       .appendChild( this.renderer.domElement );
 
-    this.selectExample(0);
+    this.selectExample(examples[0]);
     this.camera.position.z = 5;
     this.update();
     window.addEventListener('resize', this.onWindowResize.bind(this, false));
@@ -148,14 +148,13 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
     this.active = false;
   }
 
-  selectExample(example: number) {
-    const ex = createExample(example);
-    this.setState({
-      alphabet: ex['0'],
-      productionRules: ex['1'],
-      axiom: ex['2'],
-      visualization: ex['3']
-    }, () => this.loadLSystem());
+  selectExample(example: {
+    alphabet: string[];
+    productionRules: IProductionRules;
+    axiom: string;
+    visualization: ITurtleCommands;
+  }) {
+    this.setState(example, () => this.loadLSystem());
   }
 
   loadLSystem = () => {
@@ -353,13 +352,9 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
           <br />
           <label>Examples</label>
         </div>
-        <a className={"example-l-system"} onClick={() => this.selectExample(0)}>Fractal (binary) tree</a>
-        <a className={"example-l-system"} onClick={() => this.selectExample(1)}>Koch curve</a>
-        <a className={"example-l-system"} onClick={() => this.selectExample(2)}>Sierpinski triangle</a>
-        <a className={"example-l-system"} onClick={() => this.selectExample(3)}>Sierpinski triangle (approx)</a>
-        <a className={"example-l-system"} onClick={() => this.selectExample(4)}>Dragon curve</a>
-        <a className={"example-l-system"} onClick={() => this.selectExample(5)}>Lévy C curve</a>
-        <a className={"example-l-system"} onClick={() => this.selectExample(6)}>Fractal plant</a>
+        {examples.map(example =>
+          <a className={"example-l-system"} onClick={() => this.selectExample(example)}>{example.name}</a>
+        )}
       </Menu>,
       <div id="canvas-div" />,
       <NextButton onClick={this.nextLevel} />,
