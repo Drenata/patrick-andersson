@@ -1,27 +1,10 @@
 import * as React from "react";
 import { slide as Menu } from "react-burger-menu";
-import { highlightRelatedNodes, getNodeSVG, createMarker, triangleSVG, citationGraphLink } from "../network-graph/citationGraph";
-import { SliderWithDisplay } from "./Slider";
+import { citationGraphLink, createMarker, getNodeSVG, highlightRelatedNodes, triangleSVG } from "../network-graph/citationGraph";
 import { saveSVG } from "../util";
 import { Modal } from "./Modal";
+import { SliderWithDisplay } from "./Slider";
 const viva: any = require("vivagraphjs");
-
-/* TODO
- * 1. URL, authors?
- * 4. Cycle / accumulate. REMOVE/PRUNE?
- * 6. Warn many references/citations?
- * 9. After adding new articles from citations and references,
- *    why not fetch ALL of them and see if they have any links to
- *    already existing graph nodes? Requires that we mark the
- *    non-expanded articles in some way
- * 
- * EXTRA:
- * 1. Other layouts
- *   a. https://github.com/dagrejs/dagre/wiki
- *   b. Self-implement various DAG layouts (e.g. engines from graphviz)
- *   c. https://github.com/mdaines/viz.js
- */
-
 
 interface Author {
   name: string;
@@ -50,6 +33,9 @@ interface CitationGraphState {
   dragCoeff: number;
   gravity: number;
   theta: number;
+  includeCommonEdges: boolean;
+  numNodes: number;
+  numEdges: number;
 };
 
 interface Setting {
@@ -125,6 +111,9 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
       dragCoeff: this.settings.dragCoeff.initialValue,
       gravity: this.settings.gravity.initialValue,
       theta: this.settings.theta.initialValue,
+      includeCommonEdges: false,
+      numNodes: 0,
+      numEdges: 0
     }
   }
 
@@ -211,10 +200,33 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
       .then(t => t.text())
       .then(t => JSON.parse(t))
       .then(t => this.addNode(t))
+      .then(() => this.setState({
+        numNodes: this.g.getNodesCount(),
+        numEdges: this.g.getLinksCount()
+      }))
       .catch(err => alert(err));
   }
 
+  async includeEdges(id: string) {
+    // ID is expected to be in [S2PaperId | DOI | ArXivId]
+    await fetch(`https://api.semanticscholar.org/v1/paper/${id}?include_unknown_references=true`)
+      .then(t => t.text())
+      .then(t => JSON.parse(t))
+      .then(t => this.addEdges(t))
+      .then(() => this.setState({
+        numNodes: this.g.getNodesCount(),
+        numEdges: this.g.getLinksCount()
+      }))
+      .catch(err => console.error(err));
+  }
+
   addNode(article: Article) {
+    const edges = article.references.length + article.citations.length;
+    if (edges > 150) {
+      if (!confirm(`"${article.title}" contains ${edges} edges. Are you sure you want to add it?`))
+        return;
+    }
+
     // Make sure we do not add duplicates
     const addNodeToGraph = (article: Article) => {
       if (!this.articles[article.paperId]) {
@@ -234,10 +246,27 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
     article.references.forEach(art => {
       addNodeToGraph(art);
       this.g.addLink(article.paperId, art.paperId);
+      if (this.state.includeCommonEdges)
+        this.includeEdges(art.paperId);
     });
     article.citations.forEach(art => {
       addNodeToGraph(art);
       this.g.addLink(art.paperId, article.paperId);
+      if (this.state.includeCommonEdges)
+        this.includeEdges(art.paperId);
+    });
+  }
+
+  addEdges(article: Article) {
+    article.references.forEach(art => {
+      if (this.articles[art.paperId] && !this.g.hasLink(article.paperId, art.paperId)) {
+        this.g.addLink(article.paperId, art.paperId);
+      }
+    });
+    article.citations.forEach(art => {
+      if (this.articles[art.paperId] && !this.g.hasLink(article.paperId, art.paperId)) {
+        this.g.addLink(art.paperId, article.paperId);
+      }
     });
   }
 
@@ -289,6 +318,9 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
       >
         {Object.keys(this.settings).map(key => this.renderSetting(key))}
         <div id="spacer" style={{ flexGrow: 1 }} />
+        <p>Nodes: {this.state.numNodes}<br />
+          Edges: {this.state.numEdges}
+        </p>
         <a
           className="a-btn"
           onClick={() => this.reset()}>
@@ -314,6 +346,18 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
           <li>Digital Object Identifier (DOI), e.g. <a onClick={() => this.selectArticle("10.1145/2461912.2462024")}>10.1145/2461912.2462024</a></li>
           <li>ArXiv Identifier, e.g. <a onClick={() => this.selectArticle("arXiv:1803.03453")}>arXiv:1803.03453</a></li>
         </ul>
+        <h2>Options</h2>
+        <p>
+          <label>
+            <input
+              type="checkbox"
+              id="includeCommonEdges"
+              checked={this.state.includeCommonEdges}
+              onChange={() => this.setState({ includeCommonEdges: !this.state.includeCommonEdges })}
+            />
+          &nbsp;&nbsp;Load common edges
+         </label>
+        </p>
         <div style={{ margin: "0 auto", width: "288px" }}>
           <input
             className="text-input"
