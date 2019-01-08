@@ -185,6 +185,7 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
                   key={symbol + '-product'}
                   type="text"
                   name={symbol + "-product"}
+                  className="text-input"
                   value={this.state.productionRules[symbol]}
                   // Remove whitespace and update state
                   onChange={(e: React.FormEvent<HTMLInputElement>) => {
@@ -264,6 +265,7 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
       || command.command === TurtleCommandTypes.ROTATE) {
         argument = (<input
           key={symbol + '-visualization-argument'}
+          className="text-input"
           type="text"
           value={command.argument}
           onChange={(e: React.FormEvent<HTMLInputElement>) => {
@@ -323,6 +325,7 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
           <input
             type="text"
             name="alphabet"
+            className="text-input"
             id="alphabet-input"
             placeholder="Space separated symbols"
             value={this.state.alphabet.join(' ') + ' '}
@@ -333,6 +336,7 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
           <label htmlFor="axiom-input">Axiom</label>
           <input
             type="text"
+            className="text-input"
             name="axiom"
             id="axiom-input"
             value={this.state.axiom}
@@ -353,7 +357,7 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
           <label>Examples</label>
         </div>
         {examples.map(example =>
-          <a className={"example-l-system"} onClick={() => this.selectExample(example)}>{example.name}</a>
+          <a className={"a-btn"} onClick={() => this.selectExample(example)}>{example.name}</a>
         )}
       </Menu>,
       <div id="canvas-div" />,

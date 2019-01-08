@@ -22,15 +22,18 @@ export class ThirdPolynomialBars implements IBackground {
 
   optionControls = () => {
     return (
-    <div className="slidercontainer" key="third-polynomial-bars">
-      <Slider
-        min={14}
-        max={200}
-        initialValue={40}
-        id="number-of-boxes"
-        onInput={this.setNumBoxes}
-      />
-    </div>);
+      <div className="slidercontainer" key="third-polynomial-bars">
+        <div className="vertical-slider">
+          <Slider
+            min={14}
+            max={200}
+            step={1}
+            initialValue={40}
+            id="number-of-boxes"
+            onInput={this.setNumBoxes}
+          />
+        </div>
+      </div>);
   }
 
   draw(t: number, context: CanvasRenderingContext2D, width: number, height: number) {
@@ -41,9 +44,9 @@ export class ThirdPolynomialBars implements IBackground {
 
     for (let i = 0; i < this.numberOfBoxes; i++) {
       let y = Interval.sample(t, -5, 5, 10 * i / this.numberOfBoxes);
-      y = Math.pow(y, 3) * -((boxheight/2) - (height/2)) / 50;
+      y = Math.pow(y, 3) * -((boxheight / 2) - (height / 2)) / 50;
       context.fillStyle = Color.linearInterpolate(this.color1, this.color2, i / this.numberOfBoxes).toString();
-      context.fillRect(i * width / this.numberOfBoxes, y + (height / 2) - boxheight/2, boxWidth, boxheight);
+      context.fillRect(i * width / this.numberOfBoxes, y + (height / 2) - boxheight / 2, boxWidth, boxheight);
     }
   }
 }

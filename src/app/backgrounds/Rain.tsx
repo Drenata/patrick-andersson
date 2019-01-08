@@ -37,13 +37,16 @@ export class Rain implements IBackground {
 
   optionControls = () => (
     <div className="slidercontainer" key="rain">
-      <Slider
-        min={1}
-        max={500}
-        initialValue={15}
-        id="number-of-raindrops"
-        onInput={this.setNumRainDrops}
-      />
+      <div className="vertical-slider">
+        <Slider
+          min={1}
+          max={500}
+          step={1}
+          initialValue={15}
+          id="number-of-raindrops"
+          onInput={this.setNumRainDrops}
+        />
+      </div>
     </div>
   );
 

@@ -81,7 +81,7 @@ export class MandelbrotContainer extends React.Component<MandelbrotProps, Mandel
 
     // Load shaders from server and load them into the application
     const port = (location.port ? ':' + location.port : '');
-    const requests = ["vertex.glsl", "fragment.glsl"].map(file =>
+    const requests = ["shaders/mandelbrot/vertex.glsl", "shaders/mandelbrot/fragment.glsl"].map(file =>
       fetch(
         `${window.location.protocol}//${window.location.hostname}${port}/${file}`,
         { mode: "no-cors" }
