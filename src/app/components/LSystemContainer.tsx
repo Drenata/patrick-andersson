@@ -6,7 +6,7 @@ import { ITurtleCommands, TurtleCommandTypes } from '../lsystem/turtle';
 import { NextButton, ResetButton } from './buttons';
 
 
-interface LSystemProps {};
+interface LSystemProps { };
 interface LSystemState {
   height: number;
   width: number;
@@ -61,7 +61,7 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
       productionRules[key] = oldState.productionRules[key] || "";
     }
 
-    const defaultVisualization = [{command: TurtleCommandTypes.MOVE, argument: '0'}];
+    const defaultVisualization = [{ command: TurtleCommandTypes.MOVE, argument: '0' }];
     const visualization: ITurtleCommands = {};
     for (const key of alphabet) {
       visualization[key] = (oldState.visualization[key] || defaultVisualization)
@@ -94,15 +94,15 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
   componentDidMount() {
     this.level = 0;
     this.scene = new Scene();
-    this.camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 100000000 );
+    this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100000000);
 
     this.panZoom = require('three.map.control')(this.camera, document.getElementById("canvas-div"));
 
     this.renderer = new WebGLRenderer();
-    this.renderer.setSize( window.innerWidth, window.innerHeight );
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.canvas = document
       .getElementById("canvas-div")!
-      .appendChild( this.renderer.domElement );
+      .appendChild(this.renderer.domElement);
 
     this.selectExample(examples[0]);
     this.camera.position.z = 5;
@@ -115,7 +115,7 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
   update() {
     if (this.active && this.canvas) {
       requestAnimationFrame(() => this.update());
-      this.renderer.render( this.scene, this.camera );
+      this.renderer.render(this.scene, this.camera);
     }
   }
 
@@ -163,15 +163,15 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
       this.state.axiom,
       this.state.visualization);
     this.resetLevel();
-    this.setState({isDrawerOpen: false});
+    this.setState({ isDrawerOpen: false });
   }
 
   removeWhitespaceAndFilter = (string: string, allowed: string[]) =>
     string
-    .replace(/\s/g, "")
-    .split("")
-    .filter(char => allowed.join().indexOf(char) !== -1)
-    .join("");
+      .replace(/\s/g, "")
+      .split("")
+      .filter(char => allowed.join().indexOf(char) !== -1)
+      .join("");
 
   /**
    * Get one input for each symbol of the alphabet
@@ -181,23 +181,23 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
       <div
         className="production-rule"
       >
-      {symbol} → <input
-                  key={symbol + '-product'}
-                  type="text"
-                  name={symbol + "-product"}
-                  className="text-input"
-                  value={this.state.productionRules[symbol]}
-                  // Remove whitespace and update state
-                  onChange={(e: React.FormEvent<HTMLInputElement>) => {
-                    const v = this.removeWhitespaceAndFilter(e.currentTarget.value, this.state.alphabet);
-                    this.setState(prevState => {
-                      const newState = this.deepCopyState(prevState);
-                      newState.productionRules[symbol] = v;
-                      return newState;
-                    }
-                    );
-                  }}
-                />
+        {symbol} → <input
+          key={symbol + '-product'}
+          type="text"
+          name={symbol + "-product"}
+          className="text-input"
+          value={this.state.productionRules[symbol]}
+          // Remove whitespace and update state
+          onChange={(e: React.FormEvent<HTMLInputElement>) => {
+            const v = this.removeWhitespaceAndFilter(e.currentTarget.value, this.state.alphabet);
+            this.setState(prevState => {
+              const newState = this.deepCopyState(prevState);
+              newState.productionRules[symbol] = v;
+              return newState;
+            }
+            );
+          }}
+        />
       </div>
     ));
     return (<div id="production-rules">{productionRuleElements}</div>);
@@ -207,7 +207,7 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
    * Get one input for each symbol of the alphabet
    */
   getVisualizationInput(): JSX.Element {
-    const productionRuleElements =  [];
+    const productionRuleElements = [];
 
     for (const symbol of this.state.alphabet) {
       productionRuleElements.push(this.getVisualizationRule(symbol));
@@ -263,43 +263,43 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
     let argument: JSX.Element | undefined;
     if (command.command === TurtleCommandTypes.MOVE
       || command.command === TurtleCommandTypes.ROTATE) {
-        argument = (<input
-          key={symbol + '-visualization-argument'}
-          className="text-input"
-          type="text"
-          value={command.argument}
-          onChange={(e: React.FormEvent<HTMLInputElement>) => {
-            const v = e.currentTarget.value;
-            this.setState(prevState => {
-              const newState = this.deepCopyState(prevState);
-              newState.visualization[symbol][i].argument = v;
-              return newState;
-            });
-          }}
-        />);
-      }
-    return (
-    <div className={"visualization-command"}>
-      <select
-        key={command.command + command.argument}
-        value={command.command}
-        onChange={(e: React.FormEvent<HTMLSelectElement>) => {
-          const v = e.currentTarget.value as TurtleCommandTypes;
+      argument = (<input
+        key={symbol + '-visualization-argument'}
+        className="text-input"
+        type="text"
+        value={command.argument}
+        onChange={(e: React.FormEvent<HTMLInputElement>) => {
+          const v = e.currentTarget.value;
           this.setState(prevState => {
             const newState = this.deepCopyState(prevState);
-            newState.visualization[symbol][i].command = v;
+            newState.visualization[symbol][i].argument = v;
             return newState;
           });
         }}
-      >
-        {Object
-          .keys(TurtleCommandTypes)
-          .map((type: keyof typeof TurtleCommandTypes) => (
-            <option value={TurtleCommandTypes[type]} >{TurtleCommandTypes[type]}</option>
-          ))}
-      </select>
-      {argument}
-    </div>);
+      />);
+    }
+    return (
+      <div className={"visualization-command"}>
+        <select
+          key={command.command + command.argument}
+          value={command.command}
+          onChange={(e: React.FormEvent<HTMLSelectElement>) => {
+            const v = e.currentTarget.value as TurtleCommandTypes;
+            this.setState(prevState => {
+              const newState = this.deepCopyState(prevState);
+              newState.visualization[symbol][i].command = v;
+              return newState;
+            });
+          }}
+        >
+          {Object
+            .keys(TurtleCommandTypes)
+            .map((type: keyof typeof TurtleCommandTypes) => (
+              <option value={TurtleCommandTypes[type]} >{TurtleCommandTypes[type]}</option>
+            ))}
+        </select>
+        {argument}
+      </div>);
   }
 
   onAlphabetChange(e: React.FormEvent<HTMLInputElement>) {
@@ -309,7 +309,7 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
 
   onAxiomChange(e: React.FormEvent<HTMLInputElement>) {
     const v = this.removeWhitespaceAndFilter(e.currentTarget.value, this.state.alphabet);
-    this.setState({axiom: v});
+    this.setState({ axiom: v });
   }
 
   render() {
@@ -317,11 +317,11 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
       <Menu
         width={this.state.width >= 450 ? "450px" : "85%"}
         isOpen={this.state.isDrawerOpen}
-        onStateChange={(state) => {this.setState({isDrawerOpen: state.isOpen});}}
+        onStateChange={(state) => { this.setState({ isDrawerOpen: state.isOpen }); }}
       >
         <p>Give an alphabet, axiom and production rules or choose one of the examples</p>
         <div>
-        <label htmlFor="alphabet-input">Alphabet</label>
+          <label htmlFor="alphabet-input">Alphabet</label>
           <input
             type="text"
             name="alphabet"
@@ -361,8 +361,10 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
         )}
       </Menu>,
       <div id="canvas-div" />,
-      <NextButton onClick={this.nextLevel} />,
-      <ResetButton onClick={this.resetLevel} />,
+      <div id="controls-container">
+        <NextButton onClick={this.nextLevel} />
+        <ResetButton onClick={this.resetLevel} />
+      </div>
     ];
   }
 }

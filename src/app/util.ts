@@ -38,10 +38,21 @@ export function linearInterpolate(a: number, b: number, x: number) {
 }
 
 /**
+ * Return a function that maps linearly from one interval to another
+ * @param a - Start of first interval
+ * @param b - End of first interval
+ * @param c - Start of second interval
+ * @param d - End of second interval
+ */
+export function rangeToRange(a: number, b: number, c: number, d: number) {
+  return (x: number) => linearInterpolate(c, d, (x - a) / (b - a));
+}
+
+/**
  * Chunk a string into sizes of max w length.
  * A word may not be split.
- * 
- * @param s string to chunk 
+ *
+ * @param s string to chunk
  * @param w max amount of characters
  */
 export function chunk(s: string, w: number) {

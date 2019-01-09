@@ -4,9 +4,9 @@ import { IBackground } from '../backgrounds/IBackground';
 import { Rain } from '../backgrounds/Rain';
 import { Sphere } from '../backgrounds/Sphere';
 import { ThirdPolynomialBars } from '../backgrounds/ThirdPolynomialBars';
-import { NextButton, PreviousButton } from './buttons';
+import { ConfigButton, NextButton, PreviousButton } from './buttons';
 
-interface HomeBackgroundProps {};
+interface HomeBackgroundProps { };
 interface HomeBackgroundState {
   acc: number,
   lastTime: number
@@ -14,6 +14,7 @@ interface HomeBackgroundState {
   height: number,
   background: IBackground,
   backgroundIndex: number,
+  drawOptions: boolean;
 };
 
 export class HomeBackground extends React.Component<HomeBackgroundProps, HomeBackgroundState> {
@@ -33,7 +34,8 @@ export class HomeBackground extends React.Component<HomeBackgroundProps, HomeBac
       width: window.innerWidth,
       background: undefined as any,
       backgroundIndex: 0,
-     };
+      drawOptions: false
+    };
 
     this.next = this.next.bind(this);
     this.prev = this.prev.bind(this);
@@ -50,7 +52,7 @@ export class HomeBackground extends React.Component<HomeBackgroundProps, HomeBac
     // do not use real time, use accumulated time.
     // E.g. slow down the simulation if we are lagging
     // instead of actually lagging
-    this.accum += 1/60;
+    this.accum += 1 / 60;
     const canvas = this.canvas.current;
     if (canvas) {
       this.state.background.draw(
@@ -78,7 +80,7 @@ export class HomeBackground extends React.Component<HomeBackgroundProps, HomeBac
   switchBackground(newBackgroundIndex: number) {
     this.canvas.current!.getContext('2d')!.setTransform(1, 0, 0, 1, 0, 0);
     let newBackground;
-    switch(newBackgroundIndex) {
+    switch (newBackgroundIndex) {
       case 0: newBackground = new ThirdPolynomialBars(40); break;
       case 1: newBackground = new HeightmapLines(); break;
       case 1: newBackground = new Sphere(); break;
@@ -115,9 +117,12 @@ export class HomeBackground extends React.Component<HomeBackgroundProps, HomeBac
         width={this.state.width}
         height={this.state.height}
       />,
-      <NextButton onClick={this.next} />,
-      <PreviousButton onClick={this.prev} />,
-      ( this.state.background &&
+      <div id="controls-container">
+        <PreviousButton onClick={this.prev} />
+        <NextButton onClick={this.next} />
+        <ConfigButton onClick={() => this.setState({ drawOptions: !this.state.drawOptions })} />
+      </div>,
+      (this.state.background && this.state.drawOptions &&
         <div className="bg-controller">
           <this.state.background.optionControls />
         </div>
