@@ -2,6 +2,7 @@ import * as React from "react";
 import { slide as Menu } from "react-burger-menu";
 import { citationGraphLink, createMarker, getNodeSVG, highlightRelatedNodes, triangleSVG } from "../network-graph/citationGraph";
 import { saveSVG } from "../util";
+import { FullscreenButton } from './buttons';
 import { Modal } from "./Modal";
 import { SliderWithDisplay } from "./Slider";
 const viva: any = require("vivagraphjs");
@@ -355,7 +356,7 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
               checked={this.state.includeCommonEdges}
               onChange={() => this.setState({ includeCommonEdges: !this.state.includeCommonEdges })}
             />
-          &nbsp;&nbsp;Load common edges
+            &nbsp;&nbsp;Load common edges
          </label>
         </p>
         <div style={{ margin: "0 auto", width: "288px" }}>
@@ -372,7 +373,10 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
             className="a-text-btn"
             onClick={() => this.selectArticle(this.state.query)}>Select</a>
         </div>
-      </Modal>
+      </Modal>,
+      <div id="controls-container">
+        <FullscreenButton />
+      </div>
     ];
   }
 }

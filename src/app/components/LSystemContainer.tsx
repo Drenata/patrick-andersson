@@ -3,7 +3,7 @@ import { slide as Menu } from "react-burger-menu";
 import { Line, PerspectiveCamera, Scene, WebGLRenderer } from 'three';
 import { examples, IProductionRules, LSystem } from '../lsystem/lSystem';
 import { ITurtleCommands, TurtleCommandTypes } from '../lsystem/turtle';
-import { NextButton, ResetButton } from './buttons';
+import { FullscreenButton, NextButton, ResetButton } from './buttons';
 
 
 interface LSystemProps { };
@@ -364,6 +364,7 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
       <div id="controls-container">
         <NextButton onClick={this.nextLevel} />
         <ResetButton onClick={this.resetLevel} />
+        <FullscreenButton />
       </div>
     ];
   }

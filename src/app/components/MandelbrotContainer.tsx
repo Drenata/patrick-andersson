@@ -1,6 +1,7 @@
 import * as React from "react";
 import { slide as Menu } from "react-burger-menu";
 import { Mesh, PerspectiveCamera, PlaneGeometry, Scene, ShaderMaterial, WebGLRenderer } from 'three';
+import { FullscreenButton } from './buttons';
 
 interface MandelbrotProps { };
 interface MandelbrotState {
@@ -48,16 +49,16 @@ export class MandelbrotContainer extends React.Component<MandelbrotProps, Mandel
   componentDidMount() {
     this.scene = new Scene();
     this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100000000);
-    this.panZoom = require('three.map.control')({ position:{ x: 0, y: 0, z: 5 }, fov: this.camera.fov}, document.getElementById("canvas-div"));
+    this.panZoom = require('three.map.control')({ position: { x: 0, y: 0, z: 5 }, fov: this.camera.fov }, document.getElementById("canvas-div"));
 
     // the panZoom api fires events when something happens,
     // so that you can react to user actions:
-    this.panZoom.on('panstart', function() {
+    this.panZoom.on('panstart', function () {
       // fired when users begins panning (dragging) the surface
       console.log('panstart fired');
     });
 
-    this.panZoom.on('panend', function() {
+    this.panZoom.on('panend', function () {
       // fired when user stpos panning (dragging) the surface
       console.log('panend fired');
     });
@@ -171,25 +172,29 @@ export class MandelbrotContainer extends React.Component<MandelbrotProps, Mandel
         isOpen={this.state.isDrawerOpen}
         onStateChange={(state) => { this.setState({ isDrawerOpen: state.isOpen }); }}
       >
-      <h1>Mandelbrot</h1>
-      <div>
-        <h2>Iterations</h2>
-        <input
-          type="range"
-          className="slider"
-          min="1"
-          max="3000"
-          value={this.state.maxIterations}
-          onChange={(e: React.FormEvent<HTMLInputElement>) =>
-            this.updateUniforms(this.state.colorScheme, parseInt(e.currentTarget.value))}
-        />
-      </div>
-      <div>
-        <h2>Color scheme</h2>
-        {radioButtons}
-      </div>
+        <h1>Mandelbrot</h1>
+        <div>
+          <h2>Iterations</h2>
+          <input
+            type="range"
+            className="slider"
+            min="1"
+            max="3000"
+            value={this.state.maxIterations}
+            onChange={(e: React.FormEvent<HTMLInputElement>) =>
+              this.updateUniforms(this.state.colorScheme, parseInt(e.currentTarget.value))}
+          />
+        </div>
+        <div>
+          <h2>Color scheme</h2>
+          {radioButtons}
+        </div>
       </Menu>,
       <div id="canvas-div" />,
+      <div id="controls-container">
+        <FullscreenButton />
+
+      </div>
     ];
   }
 }

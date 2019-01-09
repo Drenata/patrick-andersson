@@ -4,7 +4,7 @@ import { IBackground } from '../backgrounds/IBackground';
 import { Rain } from '../backgrounds/Rain';
 import { Sphere } from '../backgrounds/Sphere';
 import { ThirdPolynomialBars } from '../backgrounds/ThirdPolynomialBars';
-import { ConfigButton, NextButton, PreviousButton } from './buttons';
+import { ConfigButton, FullscreenButton, NextButton, PreviousButton } from './buttons';
 
 interface HomeBackgroundProps { };
 interface HomeBackgroundState {
@@ -121,6 +121,7 @@ export class HomeBackground extends React.Component<HomeBackgroundProps, HomeBac
         <PreviousButton onClick={this.prev} />
         <NextButton onClick={this.next} />
         <ConfigButton onClick={() => this.setState({ drawOptions: !this.state.drawOptions })} />
+        <FullscreenButton />
       </div>,
       (this.state.background && this.state.drawOptions &&
         <div className="bg-controller">
