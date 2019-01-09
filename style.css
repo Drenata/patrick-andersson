@@ -59,6 +59,10 @@ nav {
   flex-direction: column;
 }
 
+.z-one {
+  z-index: 1;
+}
+
 .content {
   display: flex;
   height: 100%;
@@ -77,13 +81,6 @@ nav {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-}
-
-#c {
-  position: fixed;
-  z-index: -1;
-  top: 0;
-  left: 0;
 }
 
 .bg-controller {

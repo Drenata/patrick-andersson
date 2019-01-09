@@ -49,7 +49,7 @@ export const FullscreenButton = () => (
       if (screenfull)
         screenfull.isFullscreen
           ? screenfull.exit()
-          : screenfull.request();
+          : screenfull.request(document.getElementById('canvas-div')!);
     }}
   >
     {screenfull && screenfull.isFullscreen

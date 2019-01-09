@@ -83,7 +83,7 @@ export class HomeBackground extends React.Component<HomeBackgroundProps, HomeBac
     switch (newBackgroundIndex) {
       case 0: newBackground = new ThirdPolynomialBars(40); break;
       case 1: newBackground = new HeightmapLines(); break;
-      case 1: newBackground = new Sphere(); break;
+      case 2: newBackground = new Sphere(); break;
       case 3: newBackground = new Rain(); break;
       default: newBackground = new ThirdPolynomialBars(40);
     }
@@ -108,15 +108,15 @@ export class HomeBackground extends React.Component<HomeBackgroundProps, HomeBac
   render() {
     return [
       <div className="content">
-        <div><a href="https://github.com/Drenata">Github</a></div>
-        <div><a href="https://www.linkedin.com/in/patrick-andersson-8755bab4/">LinkedIn</a></div>
+        <div className="z-one"><a href="https://github.com/Drenata">Github</a></div>
+        <div className="z-one"><a href="https://www.linkedin.com/in/patrick-andersson-8755bab4/">LinkedIn</a></div>
       </div>,
+      <div id="canvas-div">
       <canvas
-        id="c"
         ref={this.canvas}
         width={this.state.width}
         height={this.state.height}
-      />,
+      /></div>,
       <div id="controls-container">
         <PreviousButton onClick={this.prev} />
         <NextButton onClick={this.next} />
