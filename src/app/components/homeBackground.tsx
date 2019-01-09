@@ -1,4 +1,5 @@
 import * as React from "react";
+import { HeightmapLines } from '../backgrounds/HeightmapLines';
 import { IBackground } from '../backgrounds/IBackground';
 import { Rain } from '../backgrounds/Rain';
 import { Sphere } from '../backgrounds/Sphere';
@@ -17,7 +18,7 @@ interface HomeBackgroundState {
 
 export class HomeBackground extends React.Component<HomeBackgroundProps, HomeBackgroundState> {
   canvas: React.RefObject<HTMLCanvasElement>;
-  numBGs = 3;
+  numBGs = 4;
   accum = 0;
 
   constructor(props: HomeBackgroundProps) {
@@ -79,8 +80,9 @@ export class HomeBackground extends React.Component<HomeBackgroundProps, HomeBac
     let newBackground;
     switch(newBackgroundIndex) {
       case 0: newBackground = new ThirdPolynomialBars(40); break;
+      case 1: newBackground = new HeightmapLines(); break;
       case 1: newBackground = new Sphere(); break;
-      case 2: newBackground = new Rain(); break;
+      case 3: newBackground = new Rain(); break;
       default: newBackground = new ThirdPolynomialBars(40);
     }
     this.setState({
