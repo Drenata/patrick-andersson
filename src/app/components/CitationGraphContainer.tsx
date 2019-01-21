@@ -5,6 +5,7 @@ import { saveSVG } from "../util";
 import { FullscreenButton } from './buttons';
 import { Modal } from "./Modal";
 import { SliderWithDisplay } from "./Slider";
+import { RouteComponentProps } from "react-router";
 const viva: any = require("vivagraphjs");
 
 interface Author {
@@ -22,7 +23,7 @@ interface Article {
   references: Article[];
 }
 
-interface CitationGraphProps { };
+interface CitationGraphProps extends RouteComponentProps<{ "0"?: string }> { };
 interface CitationGraphState {
   showModal: boolean;
   query: string;
@@ -57,6 +58,7 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
   graphics: any;
   layout: any;
   renderer: any;
+  args: string[] = [];
 
   articles: { [key: string]: Article } = {};
 
@@ -100,6 +102,15 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
 
   constructor(props: CitationGraphProps) {
     super(props);
+
+    console.log(props.match);
+
+    const arg = props.match.params[0];
+    if (arg) {
+      this.args = arg
+        .split("/")
+        .filter(w => w.length);
+    }
 
     this.state = {
       showModal: true,
@@ -183,28 +194,41 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
 
     this.renderer.run();
 
+    // Load URL parameters
+    if (this.args.length) {
+      let p = this.selectArticle(this.args[0]);
+      for (let i = 1; i < this.args.length; i++) {
+        p.then(() => this.expandArticle(this.args[i]));
+      }
+    }
+
     window.addEventListener('resize', this.onWindowResize.bind(this, false));
     window.addEventListener('orientationchange', this.onWindowResize.bind(this, false));
     window.addEventListener('load', this.onWindowResize.bind(this, false));
   }
 
   selectArticle(id: string) {
-    this.expandArticle(id);
     this.setState({
       showModal: false
     });
+    return this.expandArticle(id);
   }
 
   expandArticle(id: string) {
     // ID is expected to be in [S2PaperId | DOI | ArXivId]
-    fetch(`https://api.semanticscholar.org/v1/paper/${id}?include_unknown_references=true`)
+    return fetch(`https://api.semanticscholar.org/v1/paper/${id}?include_unknown_references=true`)
       .then(t => t.text())
       .then(t => JSON.parse(t))
       .then(t => this.addNode(t))
-      .then(() => this.setState({
-        numNodes: this.g.getNodesCount(),
-        numEdges: this.g.getLinksCount()
-      }))
+      .then(wasAdded => {
+        if (!wasAdded) return;
+
+        this.setState({
+          numNodes: this.g.getNodesCount(),
+          numEdges: this.g.getLinksCount()
+        });
+        this.props.history.replace(`${this.props.location.pathname}/${id}`);
+      })
       .catch(err => alert(err));
   }
 
@@ -221,11 +245,11 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
       .catch(err => console.error(err));
   }
 
-  addNode(article: Article) {
+  addNode(article: Article): boolean {
     const edges = article.references.length + article.citations.length;
     if (edges > 150) {
       if (!confirm(`"${article.title}" contains ${edges} edges. Are you sure you want to add it?`))
-        return;
+        return false;
     }
 
     // Make sure we do not add duplicates
@@ -256,6 +280,7 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
       if (this.state.includeCommonEdges)
         this.includeEdges(art.paperId);
     });
+    return true;
   }
 
   addEdges(article: Article) {
@@ -275,6 +300,7 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
     this.g.clear();
     this.articles = {};
     this.setState({ query: "", showModal: true, isDrawerOpen: false });
+    this.props.history.replace("/citation-graph");
   }
 
   componentWillUnmount() {
