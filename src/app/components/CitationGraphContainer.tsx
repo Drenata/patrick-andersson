@@ -1,27 +1,12 @@
 import * as React from "react";
 import { slide as Menu } from "react-burger-menu";
-import { citationGraphLink, createMarker, getNodeSVG, highlightRelatedNodes, triangleSVG } from "../network-graph/citationGraph";
+import { citationGraphLink, createMarker, getNodeSVG, highlightRelatedNodes, triangleSVG, Article, getArticle } from "../network-graph/citationGraph";
 import { saveSVG } from "../util";
 import { FullscreenButton } from './buttons';
 import { Modal } from "./Modal";
 import { SliderWithDisplay } from "./Slider";
 import { RouteComponentProps } from "react-router";
 const viva: any = require("vivagraphjs");
-
-interface Author {
-  name: string;
-  url: string;
-}
-
-interface Article {
-  title: string;
-  authors: Author[];
-  year: string;
-  url: string;
-  paperId: string; // Semantic scholar internal id
-  citations: Article[];
-  references: Article[];
-}
 
 interface CitationGraphProps extends RouteComponentProps<{ "0"?: string }> { };
 interface CitationGraphState {
@@ -108,7 +93,7 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
     const arg = props.match.params[0];
     if (arg) {
       this.args = arg
-        .split("/")
+        .split("$$")
         .filter(w => w.length);
     }
 
@@ -198,7 +183,7 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
     if (this.args.length) {
       let p = this.selectArticle(this.args[0]);
       for (let i = 1; i < this.args.length; i++) {
-        p.then(() => this.expandArticle(this.args[i]));
+        p.then(() => this.addArticle(this.args[i]));
       }
     }
 
@@ -211,25 +196,33 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
     this.setState({
       showModal: false
     });
-    return this.expandArticle(id);
+    return this.addArticle(id);
   }
 
-  expandArticle(id: string) {
-    // ID is expected to be in [S2PaperId | DOI | ArXivId]
-    return fetch(`https://api.semanticscholar.org/v1/paper/${id}?include_unknown_references=true`)
-      .then(t => t.text())
-      .then(t => JSON.parse(t))
-      .then(t => this.addNode(t))
-      .then(wasAdded => {
-        if (!wasAdded) return;
+  async expandArticle(title: string) {
+    const article = this.articles[title];
 
-        this.setState({
-          numNodes: this.g.getNodesCount(),
-          numEdges: this.g.getLinksCount()
-        });
-        this.props.history.replace(`${this.props.location.pathname}/${id}`);
-      })
-      .catch(err => alert(err));
+    if (!article || !article.paperId)
+      return alert("Sorry, Semantic scholar doesn't have any information on that entry.");
+
+    await this.addArticle(article.paperId);
+  }
+
+  async addArticle(id: string) {
+    try {
+      const article = await getArticle(id);
+      const wasAdded = this.addNode(article);
+      if (!wasAdded)
+        return;
+      this.setState({
+        numNodes: this.g.getNodesCount(),
+        numEdges: this.g.getLinksCount()
+      });
+      this.props.history.replace(`${this.props.location.pathname}$$${id}`);
+    }
+    catch (err) {
+      return alert(err);
+    }
   }
 
   async includeEdges(id: string) {
@@ -254,8 +247,8 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
 
     // Make sure we do not add duplicates
     const addNodeToGraph = (article: Article) => {
-      if (!this.articles[article.paperId]) {
-        this.articles[article.paperId] = {
+      if (!this.articles[article.title]) {
+        this.articles[article.title] = {
           authors: article.authors,
           paperId: article.paperId,
           title: article.title,
@@ -264,19 +257,19 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
           citations: [],
           references: [],
         };
-        this.g.addNode(article.paperId);
+        this.g.addNode(article.title);
       }
     }
     addNodeToGraph(article);
     article.references.forEach(art => {
       addNodeToGraph(art);
-      this.g.addLink(article.paperId, art.paperId);
+      this.g.addLink(article.title, art.title);
       if (this.state.includeCommonEdges)
         this.includeEdges(art.paperId);
     });
     article.citations.forEach(art => {
       addNodeToGraph(art);
-      this.g.addLink(art.paperId, article.paperId);
+      this.g.addLink(art.title, article.title);
       if (this.state.includeCommonEdges)
         this.includeEdges(art.paperId);
     });
@@ -285,13 +278,13 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
 
   addEdges(article: Article) {
     article.references.forEach(art => {
-      if (this.articles[art.paperId] && !this.g.hasLink(article.paperId, art.paperId)) {
-        this.g.addLink(article.paperId, art.paperId);
+      if (this.articles[art.title] && !this.g.hasLink(article.title, art.title)) {
+        this.g.addLink(article.title, art.title);
       }
     });
     article.citations.forEach(art => {
-      if (this.articles[art.paperId] && !this.g.hasLink(article.paperId, art.paperId)) {
-        this.g.addLink(art.paperId, article.paperId);
+      if (this.articles[art.title] && !this.g.hasLink(article.title, art.title)) {
+        this.g.addLink(art.title, article.title);
       }
     });
   }
