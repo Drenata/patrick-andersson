@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link, Route } from 'react-router-dom';
+import { Link, Route, Switch } from 'react-router-dom';
 import { CitationGraphContainer } from "./CitationGraphContainer";
 import { HomeBackground } from './homeBackground';
 import { LSystemContainer } from './LSystemContainer';
@@ -17,10 +17,12 @@ export class Home extends React.Component<HomeProps, HomeState> {
 
   render() {
     return [
-      <Route exact={true}  path="/" component={HomeBackground} />,
-      <Route path="/mandelbrot" component={MandelbrotContainer} />,
-      <Route path="/lsystem" component={LSystemContainer} />,
-      <Route path="/citation-graph" component={CitationGraphContainer} />,
+      <Switch>
+        <Route path="/mandelbrot" component={MandelbrotContainer} />,
+        <Route path="/lsystem" component={LSystemContainer} />,
+        <Route path="/citation-graph($$.*)*" component={CitationGraphContainer} />,
+        <Route component={HomeBackground} />,
+      </Switch>,
       <div className="projects">
         <div><Link to="/">Start</Link></div>
         <div><Link to="/mandelbrot">Mandelbrot</Link></div>

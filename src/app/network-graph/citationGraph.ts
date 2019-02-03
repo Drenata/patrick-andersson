@@ -1,6 +1,21 @@
 import { chunk } from "../util";
 const Viva: any = require("vivagraphjs");
 
+export interface Author {
+  name: string;
+  url: string;
+}
+
+export interface Article {
+  title: string;
+  authors: Author[];
+  year: string;
+  url: string;
+  paperId: string; // Semantic scholar internal id
+  citations: Article[];
+  references: Article[];
+}
+
 export function highlightRelatedNodes(
   graph: any, graphics: any,
   nodeID: string, isOn: boolean) {
@@ -71,4 +86,11 @@ export function triangleSVG() {
     .attr("d", "M 0 0 L 10 5 L 0 10 z")
     .attr("stroke", "gray")
     .attr("fill", "gray");
+}
+
+export async function getArticle(id: string): Promise<Article> {
+  // ID is expected to be in [S2PaperId | DOI | ArXivId]
+  const response = await fetch(`https://api.semanticscholar.org/v1/paper/${id}`);
+  const data = await response.text();
+  return JSON.parse(data);
 }

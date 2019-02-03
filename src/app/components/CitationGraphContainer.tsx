@@ -1,28 +1,14 @@
 import * as React from "react";
 import { slide as Menu } from "react-burger-menu";
-import { citationGraphLink, createMarker, getNodeSVG, highlightRelatedNodes, triangleSVG } from "../network-graph/citationGraph";
+import { citationGraphLink, createMarker, getNodeSVG, highlightRelatedNodes, triangleSVG, Article, getArticle } from "../network-graph/citationGraph";
 import { saveSVG } from "../util";
 import { FullscreenButton } from './buttons';
 import { Modal } from "./Modal";
 import { SliderWithDisplay } from "./Slider";
+import { RouteComponentProps } from "react-router";
 const viva: any = require("vivagraphjs");
 
-interface Author {
-  name: string;
-  url: string;
-}
-
-interface Article {
-  title: string;
-  authors: Author[];
-  year: string;
-  url: string;
-  paperId: string; // Semantic scholar internal id
-  citations: Article[];
-  references: Article[];
-}
-
-interface CitationGraphProps { };
+interface CitationGraphProps extends RouteComponentProps<{ "0"?: string }> { };
 interface CitationGraphState {
   showModal: boolean;
   query: string;
@@ -57,6 +43,7 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
   graphics: any;
   layout: any;
   renderer: any;
+  args: string[] = [];
 
   articles: { [key: string]: Article } = {};
 
@@ -100,6 +87,15 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
 
   constructor(props: CitationGraphProps) {
     super(props);
+
+    console.log(props.match);
+
+    const arg = props.match.params[0];
+    if (arg) {
+      this.args = arg
+        .split("$$")
+        .filter(w => w.length);
+    }
 
     this.state = {
       showModal: true,
@@ -183,29 +179,50 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
 
     this.renderer.run();
 
+    // Load URL parameters
+    if (this.args.length) {
+      let p = this.selectArticle(this.args[0]);
+      for (let i = 1; i < this.args.length; i++) {
+        p.then(() => this.addArticle(this.args[i]));
+      }
+    }
+
     window.addEventListener('resize', this.onWindowResize.bind(this, false));
     window.addEventListener('orientationchange', this.onWindowResize.bind(this, false));
     window.addEventListener('load', this.onWindowResize.bind(this, false));
   }
 
   selectArticle(id: string) {
-    this.expandArticle(id);
     this.setState({
       showModal: false
     });
+    return this.addArticle(id);
   }
 
-  expandArticle(id: string) {
-    // ID is expected to be in [S2PaperId | DOI | ArXivId]
-    fetch(`https://api.semanticscholar.org/v1/paper/${id}?include_unknown_references=true`)
-      .then(t => t.text())
-      .then(t => JSON.parse(t))
-      .then(t => this.addNode(t))
-      .then(() => this.setState({
+  async expandArticle(title: string) {
+    const article = this.articles[title];
+
+    if (!article || !article.paperId)
+      return alert("Sorry, Semantic scholar doesn't have any information on that entry.");
+
+    await this.addArticle(article.paperId);
+  }
+
+  async addArticle(id: string) {
+    try {
+      const article = await getArticle(id);
+      const wasAdded = this.addNode(article);
+      if (!wasAdded)
+        return;
+      this.setState({
         numNodes: this.g.getNodesCount(),
         numEdges: this.g.getLinksCount()
-      }))
-      .catch(err => alert(err));
+      });
+      this.props.history.replace(`${this.props.location.pathname}$$${id}`);
+    }
+    catch (err) {
+      return alert(err);
+    }
   }
 
   async includeEdges(id: string) {
@@ -221,17 +238,17 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
       .catch(err => console.error(err));
   }
 
-  addNode(article: Article) {
+  addNode(article: Article): boolean {
     const edges = article.references.length + article.citations.length;
     if (edges > 150) {
       if (!confirm(`"${article.title}" contains ${edges} edges. Are you sure you want to add it?`))
-        return;
+        return false;
     }
 
     // Make sure we do not add duplicates
     const addNodeToGraph = (article: Article) => {
-      if (!this.articles[article.paperId]) {
-        this.articles[article.paperId] = {
+      if (!this.articles[article.title]) {
+        this.articles[article.title] = {
           authors: article.authors,
           paperId: article.paperId,
           title: article.title,
@@ -240,33 +257,34 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
           citations: [],
           references: [],
         };
-        this.g.addNode(article.paperId);
+        this.g.addNode(article.title);
       }
     }
     addNodeToGraph(article);
     article.references.forEach(art => {
       addNodeToGraph(art);
-      this.g.addLink(article.paperId, art.paperId);
+      this.g.addLink(article.title, art.title);
       if (this.state.includeCommonEdges)
         this.includeEdges(art.paperId);
     });
     article.citations.forEach(art => {
       addNodeToGraph(art);
-      this.g.addLink(art.paperId, article.paperId);
+      this.g.addLink(art.title, article.title);
       if (this.state.includeCommonEdges)
         this.includeEdges(art.paperId);
     });
+    return true;
   }
 
   addEdges(article: Article) {
     article.references.forEach(art => {
-      if (this.articles[art.paperId] && !this.g.hasLink(article.paperId, art.paperId)) {
-        this.g.addLink(article.paperId, art.paperId);
+      if (this.articles[art.title] && !this.g.hasLink(article.title, art.title)) {
+        this.g.addLink(article.title, art.title);
       }
     });
     article.citations.forEach(art => {
-      if (this.articles[art.paperId] && !this.g.hasLink(article.paperId, art.paperId)) {
-        this.g.addLink(art.paperId, article.paperId);
+      if (this.articles[art.title] && !this.g.hasLink(article.title, art.title)) {
+        this.g.addLink(art.title, article.title);
       }
     });
   }
@@ -275,6 +293,7 @@ export class CitationGraphContainer extends React.Component<CitationGraphProps, 
     this.g.clear();
     this.articles = {};
     this.setState({ query: "", showModal: true, isDrawerOpen: false });
+    this.props.history.replace("/citation-graph");
   }
 
   componentWillUnmount() {
