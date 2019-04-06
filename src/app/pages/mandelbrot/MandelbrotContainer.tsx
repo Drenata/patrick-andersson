@@ -1,7 +1,7 @@
 import * as React from "react";
 import { slide as Menu } from "react-burger-menu";
 import { Mesh, PerspectiveCamera, PlaneGeometry, Scene, ShaderMaterial, WebGLRenderer } from 'three';
-import { FullscreenButton } from './buttons';
+import { FullscreenButton } from '../../components/buttons';
 
 interface MandelbrotProps { };
 interface MandelbrotState {

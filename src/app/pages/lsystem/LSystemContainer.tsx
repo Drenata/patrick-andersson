@@ -1,9 +1,9 @@
 import * as React from "react";
 import { slide as Menu } from "react-burger-menu";
 import { Line, PerspectiveCamera, Scene, WebGLRenderer } from 'three';
-import { examples, IProductionRules, LSystem } from '../lsystem/lSystem';
+import { FullscreenButton, NextButton, ResetButton } from '../../components/buttons';
 import { ITurtleCommands, TurtleCommandTypes } from '../lsystem/turtle';
-import { FullscreenButton, NextButton, ResetButton } from './buttons';
+import { examples, IProductionRules, LSystem } from './LSystem';
 
 
 interface LSystemProps { };

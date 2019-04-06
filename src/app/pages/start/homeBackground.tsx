@@ -1,10 +1,10 @@
 import * as React from "react";
-import { HeightmapLines } from '../backgrounds/HeightmapLines';
-import { IBackground } from '../backgrounds/IBackground';
-import { Rain } from '../backgrounds/Rain';
-import { Sphere } from '../backgrounds/Sphere';
-import { ThirdPolynomialBars } from '../backgrounds/ThirdPolynomialBars';
-import { ConfigButton, FullscreenButton, NextButton, PreviousButton } from './buttons';
+import { ConfigButton, FullscreenButton, NextButton, PreviousButton } from '../../components/buttons';
+import { HeightmapLines } from './backgrounds/HeightmapLines';
+import { IBackground } from './backgrounds/IBackground';
+import { Rain } from './backgrounds/Rain';
+import { Sphere } from './backgrounds/Sphere';
+import { ThirdPolynomialBars } from './backgrounds/ThirdPolynomialBars';
 
 interface HomeBackgroundProps { };
 interface HomeBackgroundState {
@@ -79,7 +79,7 @@ export class HomeBackground extends React.Component<HomeBackgroundProps, HomeBac
 
   switchBackground(newBackgroundIndex: number) {
     this.canvas.current!.getContext('2d')!.setTransform(1, 0, 0, 1, 0, 0);
-    let newBackground;
+    let newBackground: IBackground;
     switch (newBackgroundIndex) {
       case 0: newBackground = new ThirdPolynomialBars(40); break;
       case 1: newBackground = new HeightmapLines(); break;
@@ -112,11 +112,11 @@ export class HomeBackground extends React.Component<HomeBackgroundProps, HomeBac
         <div className="z-one"><a href="https://www.linkedin.com/in/patrick-andersson-8755bab4/">LinkedIn</a></div>
       </div>,
       <div id="canvas-div">
-      <canvas
-        ref={this.canvas}
-        width={this.state.width}
-        height={this.state.height}
-      /></div>,
+        <canvas
+          ref={this.canvas}
+          width={this.state.width}
+          height={this.state.height}
+        /></div>,
       <div id="controls-container">
         <PreviousButton onClick={this.prev} />
         <NextButton onClick={this.next} />

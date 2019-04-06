@@ -1,4 +1,5 @@
-import { chunk } from "../util";
+import { chunk } from '../../util/util';
+
 const Viva: any = require("vivagraphjs");
 
 export interface Author {

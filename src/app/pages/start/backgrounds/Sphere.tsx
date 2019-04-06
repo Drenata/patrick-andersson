@@ -1,7 +1,7 @@
 import * as React from "react";
-import { Color } from '../color';
-import { Slider } from '../components/Slider';
-import { Interval, linearInterpolate } from '../util';
+import { Slider } from '../../../components/Slider';
+import { Color } from '../../../util/color';
+import { Interval, linearInterpolate } from '../../../util/util';
 import { IBackground } from './IBackground';
 
 export class Sphere implements IBackground {

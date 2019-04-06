@@ -1,5 +1,5 @@
 import { BufferAttribute, BufferGeometry, LineBasicMaterial, LineSegments, Path } from 'three';
-import { Color } from '../color';
+import { Color } from '../../util/color';
 
 export enum TurtleCommandTypes {
   MOVE = "Move",
@@ -68,10 +68,10 @@ export class TurtleGraphics {
 
   act(command: TurtleCommand) {
     switch (command.command) {
-      case TurtleCommandTypes.MOVE:   return this.move(parseFloat(command.argument));
+      case TurtleCommandTypes.MOVE: return this.move(parseFloat(command.argument));
       case TurtleCommandTypes.ROTATE: return this.rotate(parseFloat(command.argument));
-      case TurtleCommandTypes.PUSH:   return this.pushState();
-      case TurtleCommandTypes.POP:    return this.popState();
+      case TurtleCommandTypes.PUSH: return this.pushState();
+      case TurtleCommandTypes.POP: return this.popState();
     }
   }
 
@@ -85,7 +85,7 @@ export class TurtleGraphics {
     }
 
     const geometry = new BufferGeometry().addAttribute("position", new BufferAttribute(new Float32Array(turtle.positions), 3));
-    const material = new LineBasicMaterial( { color: 0xffffff } );
-    return new LineSegments( geometry, material );
+    const material = new LineBasicMaterial({ color: 0xffffff });
+    return new LineSegments(geometry, material);
   }
 }

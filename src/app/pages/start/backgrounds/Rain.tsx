@@ -1,7 +1,7 @@
 import * as React from "react";
-import { Color } from '../color';
-import { Slider } from '../components/Slider';
-import { Random } from '../random';
+import { Slider } from '../../../components/Slider';
+import { Color } from '../../../util/color';
+import { Random } from '../../../util/random';
 import { IBackground } from './IBackground';
 
 export class Rain implements IBackground {

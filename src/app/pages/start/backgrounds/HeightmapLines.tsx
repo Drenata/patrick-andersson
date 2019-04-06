@@ -1,8 +1,8 @@
 import * as React from "react";
 import * as Simplex from "simplex-noise";
-import { Color } from '../color';
-import { Slider } from '../components/Slider';
-import { rangeToRange } from '../util';
+import { Slider } from '../../../components/Slider';
+import { Color } from '../../../util/color';
+import { rangeToRange } from '../../../util/util';
 import { IBackground } from './IBackground';
 
 export class HeightmapLines implements IBackground {

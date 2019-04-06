@@ -1,11 +1,11 @@
 import * as React from "react";
 import { slide as Menu } from "react-burger-menu";
-import { citationGraphLink, createMarker, getNodeSVG, highlightRelatedNodes, triangleSVG, Article, getArticle } from "../network-graph/citationGraph";
-import { saveSVG } from "../util";
-import { FullscreenButton } from './buttons';
-import { Modal } from "./Modal";
-import { SliderWithDisplay } from "./Slider";
 import { RouteComponentProps } from "react-router";
+import { FullscreenButton } from '../../components/buttons';
+import { Modal } from "../../components/Modal";
+import { SliderWithDisplay } from "../../components/Slider";
+import { saveSVG } from "../../util/util";
+import { Article, citationGraphLink, createMarker, getArticle, getNodeSVG, highlightRelatedNodes, triangleSVG } from './citationGraph';
 const viva: any = require("vivagraphjs");
 
 interface CitationGraphProps extends RouteComponentProps<{ "0"?: string }> { };
