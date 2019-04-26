@@ -13,10 +13,6 @@ float modI(float a,float b) {
   return floor(m+0.5);
 }
 
-vec2 q2s(float a, float b) {
-  return vec2(a+b,b-(b-a));
-}
-
 void main(void) {
   float x0 = (gl_FragCoord.x - ww/2.0)*(0.0004*zoom) + (offsetX * 0.25) - 0.5;
   float y0 = (gl_FragCoord.y - wh/2.0)*(0.0004*zoom) + (offsetY * 0.25);

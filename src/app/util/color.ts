@@ -22,6 +22,25 @@ export class Color {
     )
   }
 
+  static componentToHex(c: number) {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+  }
+
+  static rgbToHex(r: number, g: number, b: number) {
+    return "#" + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
+  }
+
+  static hexToRgb(hex: string): [number, number, number] {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if (!result) throw "Invalid hex " + hex;
+    return [
+      parseInt(result[1], 16),
+      parseInt(result[2], 16),
+      parseInt(result[3], 16)
+    ];
+  }
+
   toString(): string {
     return `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a})`;
   }

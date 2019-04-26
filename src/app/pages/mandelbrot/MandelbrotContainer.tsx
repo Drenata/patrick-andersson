@@ -1,7 +1,8 @@
 import * as React from "react";
 import { slide as Menu } from "react-burger-menu";
-import { Mesh, PerspectiveCamera, PlaneGeometry, Scene, ShaderMaterial, WebGLRenderer } from 'three';
 import { FullscreenButton } from '../../components/buttons';
+import { GPU, Kernel } from "gpu.js";
+import * as panzoom from "pan-zoom";
 
 interface MandelbrotProps { };
 interface MandelbrotState {
@@ -12,18 +13,21 @@ interface MandelbrotState {
   colorScheme: number;
 };
 
-export class MandelbrotContainer extends React.Component<MandelbrotProps, MandelbrotState> {
-  scene: THREE.Scene;
-  camera: PerspectiveCamera;
-  renderer: THREE.Renderer;
-  canvas: HTMLCanvasElement;
-  panZoom: any;
+type State = MandelbrotState & panzoom.CameraParams;
+
+export class MandelbrotContainer extends React.Component<MandelbrotProps, State> {
+  canvas: React.RefObject<HTMLCanvasElement>;
+
   colorSchemes: [number, string][] = [[0, "Green"], [1, "Wikipedia"], [2, "Boring"]];
-  mesh: Mesh;
   active = true;
+  invalidated = false;
+  gpu: GPU;
+  kernel: Kernel;
 
   constructor(props: MandelbrotProps) {
     super(props);
+
+    this.canvas = React.createRef();
 
     this.state = {
       height: window.innerHeight,
@@ -31,6 +35,10 @@ export class MandelbrotContainer extends React.Component<MandelbrotProps, Mandel
       isDrawerOpen: false,
       colorScheme: 0,
       maxIterations: 700,
+      offsetX: -1,
+      offsetY: 2,
+      scaleX: 0.003,
+      scaleY: 0.003,
     };
   }
 
@@ -38,99 +46,135 @@ export class MandelbrotContainer extends React.Component<MandelbrotProps, Mandel
     this.setState({
       height: window.innerHeight,
       width: window.innerWidth,
-    }, () => {
-      this.camera.aspect = this.state.width / this.state.height;
-      this.camera.updateProjectionMatrix();
-      this.renderer.setSize(this.state.width, this.state.height);
-    });
-
+    }, () => this.invalidated = true);
   }
 
   componentDidMount() {
-    this.scene = new Scene();
-    this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100000000);
-    this.panZoom = require('three.map.control')({ position: { x: 0, y: 0, z: 5 }, fov: this.camera.fov }, document.getElementById("canvas-div"));
-
-    // the panZoom api fires events when something happens,
-    // so that you can react to user actions:
-    this.panZoom.on('panstart', function () {
-      // fired when users begins panning (dragging) the surface
-      console.log('panstart fired');
-    });
-
-    this.panZoom.on('panend', function () {
-      // fired when user stpos panning (dragging) the surface
-      console.log('panend fired');
-    });
-
-    this.panZoom.on('beforepan', (panPayload: any) => {
-      (this.mesh.material as ShaderMaterial).uniforms.offsetX.value += panPayload.dx;
-      (this.mesh.material as ShaderMaterial).uniforms.offsetY.value += panPayload.dy;
-    });
-
-    this.panZoom.on('beforezoom', (panPayload: any) => {
-      (this.mesh.material as ShaderMaterial).uniforms.offsetX.value += panPayload.dx;
-      (this.mesh.material as ShaderMaterial).uniforms.offsetY.value += panPayload.dy;
-      (this.mesh.material as ShaderMaterial).uniforms.zoom.value =
-        /* Math.max(Number.EPSILON, */ (this.mesh.material as ShaderMaterial).uniforms.zoom.value + panPayload.dz/* ) */;
-      // fired when befor zoom in/zoom out
-    });
-
-    if (!fetch) {
-      throw "Get a real browser";
-    }
-
-    // Load shaders from server and load them into the application
-    const port = (location.port ? ':' + location.port : '');
-    const requests = ["shaders/mandelbrot/vertex.glsl", "shaders/mandelbrot/fragment.glsl"].map(file =>
-      fetch(
-        `${window.location.protocol}//${window.location.hostname}${port}/${file}`,
-        { mode: "no-cors" }
-      )
-    );
-    Promise.all(requests)
-      .then(([vertexShader, fragmentShader]) => Promise.all([vertexShader.text(), fragmentShader.text()]))
-      .then(([vertexShader, fragmentShader]) => this.loadShaders(vertexShader, fragmentShader));
-
-    this.renderer = new WebGLRenderer();
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.canvas = document
-      .getElementById("canvas-div")!
-      .appendChild(this.renderer.domElement);
-
     window.addEventListener('resize', this.onWindowResize.bind(this, false));
     window.addEventListener('orientationchange', this.onWindowResize.bind(this, false));
     window.addEventListener('load', this.onWindowResize.bind(this, false));
-  }
 
-  loadShaders(vertexShader: string, fragmentShader: string) {
-    const m = new ShaderMaterial({
-      uniforms: {
-        maxIterations: { value: this.state.maxIterations },
-        colorScheme: { value: this.state.colorScheme },
-        ww: { value: this.state.width },
-        wh: { value: this.state.height },
-        offsetX: { value: 0 },
-        offsetY: { value: 0 },
-        zoom: { value: 5 },
-      },
-      vertexShader: vertexShader,
-      fragmentShader: fragmentShader,
+    //@ts-ignore
+    panzoom(this.canvas.current, (e: any) => {
+
+      const clamp = (x: number, min: number, max: number) => {
+        return x < min
+          ? min
+          : x > max
+            ? max
+            : x;
+      }
+
+      this.setState(oldState => {
+        var left = 0;
+        var top = 0;
+        var width = oldState.width;
+        var height = oldState.height;
+
+        const zoom = clamp(-e.dz, -height * .75, height * .75) / height;
+
+        let x = { offset: oldState.offsetX, scale: oldState.scaleX },
+          y = { offset: oldState.offsetY, scale: oldState.scaleY };
+
+        var oX = 0;
+        x.offset -= oldState.scaleX * e.dx;
+
+        var tx = (e.x - left) / width - oX;
+        var prevScale = x.scale;
+        x.scale *= (1 - zoom);
+        x.scale = clamp(x.scale, 0.000000000000001, 100000000000000);
+        x.offset -= width * (x.scale - prevScale) * tx;
+
+        var oY = 0;
+        y.offset += y.scale * e.dy;
+        var ty = oY - (e.y - top) / height;
+        var prevScale$1 = y.scale;
+        y.scale *= (1 - zoom);
+        y.scale = clamp(y.scale, 0.000000000000001, 100000000000000);
+        y.offset -= height * (y.scale - prevScale$1) * ty;
+
+        return ({
+          offsetX: x.offset,
+          offsetY: y.offset,
+          scaleX: x.scale,
+          scaleY: y.scale,
+        })
+      }, () => this.invalidated = true);
+
     });
 
-    this.mesh = new Mesh(new PlaneGeometry(2, 2), m);
-    this.scene.add(this.mesh);
-    this.update();
+    this.gpu = new GPU({
+      canvas: this.canvas.current!,
+      mode: "webgl",
+      format: "Float32Array",
+    });
+
+    this.kernel = this.gpu.createKernel(
+      function mandelbrot(
+        ww: number,
+        wh: number,
+        offsetX: number,
+        offsetY: number,
+        scaleX: number,
+        scaleY: number
+      ) {
+        const maxIterations = 600;
+
+        let i = this.thread.x;
+        let j = this.thread.y!;
+        
+        let x0 = i;
+        let y0 = j - wh;
+        x0 *= scaleX;
+        y0 *= scaleY;
+        x0 += offsetX;
+        y0 += offsetY;
+
+        let x = 0;
+        let y = 0;
+
+        let iteration = 0;
+        for (let i = 0; i < 999999; i++) {
+          if (x * x + y * y > 4 || i >= maxIterations) {
+            break;
+          }
+
+          const temp = x * x - y * y + x0;
+          y = 2 * x * y + y0;
+          x = temp;
+          iteration++;
+        }
+
+        const q = iteration / maxIterations;
+        if (q >= 1)
+          // @ts-ignore
+          this.color(0, 0, 0);
+        else if (q > 0.5)
+          // @ts-ignore
+          this.color(q, 1, q);
+        else
+          // @ts-ignore
+          this.color(0.1, q, 0.1);
+      }, {
+        output: {
+          x: this.state.width,
+          y: this.state.height
+        }, precision: "single",
+        graphical: true,
+        immutable: true
+      });
+
+      requestAnimationFrame(() => this.update());
   }
 
   update() {
-    if (this.active && this.canvas) {
-      (this.mesh.material as ShaderMaterial).uniforms.colorScheme.value = this.state.colorScheme;
-      (this.mesh.material as ShaderMaterial).uniforms.maxIterations.value = this.state.maxIterations;
-      (this.mesh.material as ShaderMaterial).uniforms.ww.value = this.state.width;
-      (this.mesh.material as ShaderMaterial).uniforms.wh.value = this.state.height;
+    if (this.active && this.canvas.current) {
+      if (this.invalidated) {
+        this.kernel.run(this.state.width, this.state.height, this.state.offsetX, this.state.offsetY, this.state.scaleX, this.state.scaleY);
+        this.invalidated = false;
+      }
+      console.log(this.state.offsetX, this.state.offsetY, this.state.scaleX)
       requestAnimationFrame(() => this.update());
-      this.renderer.render(this.scene, this.camera);
     }
   }
 
@@ -138,11 +182,6 @@ export class MandelbrotContainer extends React.Component<MandelbrotProps, Mandel
     window.removeEventListener('resize', this.onWindowResize);
     window.removeEventListener('orientationchange', this.onWindowResize);
     window.removeEventListener('load', this.onWindowResize);
-    this.canvas.remove();
-    this.canvas = undefined as any;
-    (this.mesh.material as ShaderMaterial).dispose();
-    this.mesh.remove();
-    this.panZoom.dispose();
     this.active = false;
   }
 
@@ -190,7 +229,13 @@ export class MandelbrotContainer extends React.Component<MandelbrotProps, Mandel
           {radioButtons}
         </div>
       </Menu>,
-      <div id="canvas-div" />,
+      <div id="canvas-div">
+        <canvas
+          ref={this.canvas}
+          width={this.state.width}
+          height={this.state.height}
+        />
+      </div>,
       <div id="controls-container">
         <FullscreenButton />
 
