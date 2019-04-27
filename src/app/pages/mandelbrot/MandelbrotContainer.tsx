@@ -1,33 +1,31 @@
+import { GPU, Kernel } from "gpu.js";
 import * as React from "react";
 import { slide as Menu } from "react-burger-menu";
 import { FullscreenButton } from '../../components/buttons';
-import { GPU, Kernel } from "gpu.js";
-import * as panzoom from "pan-zoom";
+import { CameraState, panzoomWrapper } from '../../util/panzoomWrapper';
+import { createMandelbrotKernel } from './mandelbrotKernel';
 
 interface MandelbrotProps { };
-interface MandelbrotState {
-  height: number;
-  width: number;
+interface MandelbrotState extends CameraState {
   isDrawerOpen: boolean;
   maxIterations: number;
   colorScheme: number;
 };
 
-type State = MandelbrotState & panzoom.CameraParams;
+export class MandelbrotContainer extends React.Component<MandelbrotProps, MandelbrotState, any> {
+  canvas: HTMLCanvasElement;
 
-export class MandelbrotContainer extends React.Component<MandelbrotProps, State> {
-  canvas: React.RefObject<HTMLCanvasElement>;
-
-  colorSchemes: [number, string][] = [[0, "Green"], [1, "Wikipedia"], [2, "Boring"]];
+  colorSchemes: [number, string][] = [[0, "Green"], [1, "Wikipedia"], [2, "Greyscale"]];
   active = true;
-  invalidated = false;
+  invalidated = true;
   gpu: GPU;
   kernel: Kernel;
+  cleanup: (() => void)[] = [];
 
   constructor(props: MandelbrotProps) {
     super(props);
 
-    this.canvas = React.createRef();
+    const initialScale = 0.003;
 
     this.state = {
       height: window.innerHeight,
@@ -35,10 +33,10 @@ export class MandelbrotContainer extends React.Component<MandelbrotProps, State>
       isDrawerOpen: false,
       colorScheme: 0,
       maxIterations: 700,
-      offsetX: -1,
-      offsetY: 2,
-      scaleX: 0.003,
-      scaleY: 0.003,
+      offsetX: 1.2 * initialScale * -window.innerWidth / 2,
+      offsetY: initialScale * window.innerHeight / 2,
+      scaleX: initialScale,
+      scaleY: initialScale,
     };
   }
 
@@ -46,7 +44,13 @@ export class MandelbrotContainer extends React.Component<MandelbrotProps, State>
     this.setState({
       height: window.innerHeight,
       width: window.innerWidth,
-    }, () => this.invalidated = true);
+    }, () => {
+      this.invalidated = true;
+
+      // Only doing this here is a hack, gpu.js is broken.
+      this.canvas.width = this.state.width;
+      this.canvas.height = this.state.height;
+    });
   }
 
   componentDidMount() {
@@ -54,126 +58,43 @@ export class MandelbrotContainer extends React.Component<MandelbrotProps, State>
     window.addEventListener('orientationchange', this.onWindowResize.bind(this, false));
     window.addEventListener('load', this.onWindowResize.bind(this, false));
 
-    //@ts-ignore
-    panzoom(this.canvas.current, (e: any) => {
+    this.canvas = document.getElementById("canvas-div")!
+      .appendChild(
+        document.createElement("canvas")
+      );
 
-      const clamp = (x: number, min: number, max: number) => {
-        return x < min
-          ? min
-          : x > max
-            ? max
-            : x;
-      }
-
-      this.setState(oldState => {
-        var left = 0;
-        var top = 0;
-        var width = oldState.width;
-        var height = oldState.height;
-
-        const zoom = clamp(-e.dz, -height * .75, height * .75) / height;
-
-        let x = { offset: oldState.offsetX, scale: oldState.scaleX },
-          y = { offset: oldState.offsetY, scale: oldState.scaleY };
-
-        var oX = 0;
-        x.offset -= oldState.scaleX * e.dx;
-
-        var tx = (e.x - left) / width - oX;
-        var prevScale = x.scale;
-        x.scale *= (1 - zoom);
-        x.scale = clamp(x.scale, 0.000000000000001, 100000000000000);
-        x.offset -= width * (x.scale - prevScale) * tx;
-
-        var oY = 0;
-        y.offset += y.scale * e.dy;
-        var ty = oY - (e.y - top) / height;
-        var prevScale$1 = y.scale;
-        y.scale *= (1 - zoom);
-        y.scale = clamp(y.scale, 0.000000000000001, 100000000000000);
-        y.offset -= height * (y.scale - prevScale$1) * ty;
-
-        return ({
-          offsetX: x.offset,
-          offsetY: y.offset,
-          scaleX: x.scale,
-          scaleY: y.scale,
-        })
-      }, () => this.invalidated = true);
-
-    });
+    this.cleanup.push(
+      panzoomWrapper(this, this.canvas, () => this.invalidated = true)
+    );
 
     this.gpu = new GPU({
-      canvas: this.canvas.current!,
+      canvas: this.canvas,
       mode: "webgl",
       format: "Float32Array",
     });
-
-    this.kernel = this.gpu.createKernel(
-      function mandelbrot(
-        ww: number,
-        wh: number,
-        offsetX: number,
-        offsetY: number,
-        scaleX: number,
-        scaleY: number
-      ) {
-        const maxIterations = 600;
-
-        let i = this.thread.x;
-        let j = this.thread.y!;
-        
-        let x0 = i;
-        let y0 = j - wh;
-        x0 *= scaleX;
-        y0 *= scaleY;
-        x0 += offsetX;
-        y0 += offsetY;
-
-        let x = 0;
-        let y = 0;
-
-        let iteration = 0;
-        for (let i = 0; i < 999999; i++) {
-          if (x * x + y * y > 4 || i >= maxIterations) {
-            break;
-          }
-
-          const temp = x * x - y * y + x0;
-          y = 2 * x * y + y0;
-          x = temp;
-          iteration++;
-        }
-
-        const q = iteration / maxIterations;
-        if (q >= 1)
-          // @ts-ignore
-          this.color(0, 0, 0);
-        else if (q > 0.5)
-          // @ts-ignore
-          this.color(q, 1, q);
-        else
-          // @ts-ignore
-          this.color(0.1, q, 0.1);
-      }, {
-        output: {
-          x: this.state.width,
-          y: this.state.height
-        }, precision: "single",
-        graphical: true,
-        immutable: true
+    this.kernel = createMandelbrotKernel(this.gpu,
+      {
+        x: window.screen.availWidth,
+        y: window.screen.availHeight
       });
 
-      requestAnimationFrame(() => this.update());
+    //@ts-ignore
+    this.cleanup.push(() => this.kernel.destroy());
+    this.cleanup.push(() => this.gpu.destroy());
+
+    requestAnimationFrame(() => this.update());
   }
 
   update() {
-    if (this.active && this.canvas.current) {
+    if (this.active && this.canvas) {
       if (this.invalidated) {
-        this.kernel.run(this.state.width, this.state.height, this.state.offsetX, this.state.offsetY, this.state.scaleX, this.state.scaleY);
+        this.kernel.run(
+          this.state.width, this.state.height,
+          this.state.offsetX, this.state.offsetY,
+          this.state.scaleX, this.state.scaleY,
+          this.state.maxIterations, this.state.colorScheme);
         this.invalidated = false;
       }
-      console.log(this.state.offsetX, this.state.offsetY, this.state.scaleX)
       requestAnimationFrame(() => this.update());
     }
   }
@@ -182,6 +103,7 @@ export class MandelbrotContainer extends React.Component<MandelbrotProps, State>
     window.removeEventListener('resize', this.onWindowResize);
     window.removeEventListener('orientationchange', this.onWindowResize);
     window.removeEventListener('load', this.onWindowResize);
+    this.cleanup.map(c => c());
     this.active = false;
   }
 
@@ -189,7 +111,7 @@ export class MandelbrotContainer extends React.Component<MandelbrotProps, State>
     this.setState({
       colorScheme: colorScheme,
       maxIterations: maxIterations,
-    })
+    }, () => this.invalidated = true);
   }
 
   render() {
@@ -209,7 +131,7 @@ export class MandelbrotContainer extends React.Component<MandelbrotProps, State>
       <Menu
         width={this.state.width >= 400 ? "400px" : "85%"}
         isOpen={this.state.isDrawerOpen}
-        onStateChange={(state) => { this.setState({ isDrawerOpen: state.isOpen }); }}
+        onStateChange={state => { this.setState({ isDrawerOpen: state.isOpen }); }}
       >
         <h1>Mandelbrot</h1>
         <div>
@@ -230,15 +152,9 @@ export class MandelbrotContainer extends React.Component<MandelbrotProps, State>
         </div>
       </Menu>,
       <div id="canvas-div">
-        <canvas
-          ref={this.canvas}
-          width={this.state.width}
-          height={this.state.height}
-        />
       </div>,
       <div id="controls-container">
         <FullscreenButton />
-
       </div>
     ];
   }
