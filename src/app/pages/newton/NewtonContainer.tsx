@@ -1,13 +1,12 @@
-import * as TeX from '@matejmazur/react-katex';
 import { GPU, Kernel } from 'gpu.js';
 import { derivative, parse as mathParse } from "mathjs";
 import * as React from "react";
-import { slide as Menu } from "react-burger-menu";
 import { FullscreenButton, ResetButton } from '../../components/buttons';
-import { Modal } from "../../components/Modal";
 import { CameraState, panzoomWrapper } from '../../util/panzoomWrapper';
 import { resizeGraphicalKernel } from '../../webgl/gpujs';
 import { newtonKernel } from './newtonKernel';
+import { NewtonMenu } from './NewtonMenu';
+import { NewtonModal } from './newtonModal';
 
 interface NewtonProps { };
 interface NewtonState extends CameraState {
@@ -89,7 +88,7 @@ export class NewtonContainer extends React.Component<NewtonProps, NewtonState> {
     this.cleanup.push(() => this.kernel.destroy());
     this.cleanup.push(() => this.gpu.destroy());
 
-    this.updateExpressionAndDerivative()
+    this.compile()
     requestAnimationFrame(() => this.update());
   }
 
@@ -115,14 +114,7 @@ export class NewtonContainer extends React.Component<NewtonProps, NewtonState> {
     this.active = false;
   }
 
-  updateUniforms(maxIterations: number) {
-    this.setState({
-      maxIterations: maxIterations,
-    });
-    this.invalidated = true;
-  }
-
-  updateExpressionAndDerivative() {
+  compile() {
     try {
       const expr = mathParse(this.state.expr);
 
@@ -167,64 +159,34 @@ export class NewtonContainer extends React.Component<NewtonProps, NewtonState> {
 
     return (
       <React.Fragment>
-        <Menu
-          width={this.state.width >= 400 ? "400px" : "85%"}
+        <NewtonMenu
+          width={this.state.width}
           isOpen={this.state.isDrawerOpen}
-          onStateChange={(state) => { this.setState({ isDrawerOpen: state.isOpen }); }}
-        >
-          <h1>Newton Fractal</h1>
-          <div>
-            <h2>Iterations</h2>
-            <input
-              type="range"
-              className="slider"
-              min="1"
-              max="3000"
-              value={this.state.maxIterations}
-              onChange={(e: React.FormEvent<HTMLInputElement>) =>
-                this.updateUniforms(parseInt(e.currentTarget.value))}
-            />
-          </div>
-        </Menu>
+          onMenuStateChange={state => this.setState({ isDrawerOpen: state.isOpen })}
+          onMaxIterationsChange={e => {
+            this.setState({
+              maxIterations: parseInt(e.currentTarget.value),
+            });
+            this.invalidated = true;
+          }}
+          maxIterations={this.state.maxIterations}
+        />
         <div id="canvas-div" />
-        <Modal show={this.state.showModal}>
-          <h1>Newton fractal</h1>
-          <p>This page performs the Newton's method root-finding procedure</p>
-          <TeX math="z_{t+1} \gets z_t - \frac{f(z)}{f^\prime(z)}" block />
-          <p>to points in the complex plane <TeX math="z_0" />.
-          By coloring each point according to which root was found and shading by number of iterations required, interesting images emerge.
-        Enter some function, press compile and then go!</p>
-          <div style={{ margin: "0 auto", width: "288px" }}>
-            <input
-              className="text-input"
-              placeholder=""
-              value={this.state.expr}
-              onChange={e => {
-                this.setState({
-                  expr: e.currentTarget.value,
-                }, this.updateExpressionAndDerivative);
-              }}
-            />
-          </div>
-          <p style={{ color: "red" }}>{this.state.errorText}</p>
-          <p>Your currently selected formula is</p>
-          <TeX math={this.state.texExpr} block />
-          <p>and its derivative is</p>
-          <TeX math={this.state.dTexExpr} block />
-          <a
-            className="a-text-btn"
-            style={{
-              float: "right"
-            }}
-            onClick={() => {
-              this.setState({
-                showModal: false,
-              });
-            }}>Explore</a>
-        </Modal>
+        <NewtonModal
+          showModal={this.state.showModal}
+          expression={this.state.expr}
+          onExpressionChanged={e => this.setState({ expr: e }, this.compile)}
+          texExpression={this.state.texExpr}
+          differentiatedTexExpression={this.state.dTexExpr}
+          errorText={this.state.errorText}
+          onClose={() => this.setState({ showModal: false })}
+
+        />
         <div id="controls-container">
           <FullscreenButton />
-          {!this.state.showModal && <ResetButton onClick={() => this.setState({ showModal: true })} />}
+          {!this.state.showModal &&
+            <ResetButton onClick={() => this.setState({ showModal: true })} />
+          }
         </div>
       </React.Fragment>
     );
