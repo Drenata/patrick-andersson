@@ -96,6 +96,7 @@ export class LSystemContainer extends React.Component<LSystemProps, LSystemState
     this.scene = new Scene();
     this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100000000);
 
+    //@ts-ignore
     this.panZoom = require('three.map.control')(this.camera, document.getElementById("canvas-div"));
 
     this.renderer = new WebGLRenderer();

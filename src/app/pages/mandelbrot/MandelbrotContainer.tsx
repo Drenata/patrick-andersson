@@ -3,6 +3,7 @@ import * as React from "react";
 import { slide as Menu } from "react-burger-menu";
 import { FullscreenButton } from '../../components/buttons';
 import { CameraState, panzoomWrapper } from '../../util/panzoomWrapper';
+import { resizeGraphicalKernel } from '../../webgl/gpujs';
 import { createMandelbrotKernel } from './mandelbrotKernel';
 
 interface MandelbrotProps { };
@@ -47,9 +48,9 @@ export class MandelbrotContainer extends React.Component<MandelbrotProps, Mandel
     }, () => {
       this.invalidated = true;
 
-      // Only doing this here is a hack, gpu.js is broken.
       this.canvas.width = this.state.width;
       this.canvas.height = this.state.height;
+      resizeGraphicalKernel(this.kernel, this.state.width, this.state.height);
     });
   }
 
@@ -116,7 +117,7 @@ export class MandelbrotContainer extends React.Component<MandelbrotProps, Mandel
 
   render() {
     const radioButtons = this.colorSchemes.map(([v, n]) => (
-      <label>
+      <label key={v}>
         <input
           type="radio"
           name="color-scheme"
@@ -127,35 +128,36 @@ export class MandelbrotContainer extends React.Component<MandelbrotProps, Mandel
         {' '}{n}
       </label>
     ));
-    return [
-      <Menu
-        width={this.state.width >= 400 ? "400px" : "85%"}
-        isOpen={this.state.isDrawerOpen}
-        onStateChange={state => { this.setState({ isDrawerOpen: state.isOpen }); }}
-      >
-        <h1>Mandelbrot</h1>
-        <div>
-          <h2>Iterations</h2>
-          <input
-            type="range"
-            className="slider"
-            min="1"
-            max="3000"
-            value={this.state.maxIterations}
-            onChange={(e: React.FormEvent<HTMLInputElement>) =>
-              this.updateUniforms(this.state.colorScheme, parseInt(e.currentTarget.value))}
-          />
+    return (
+      <React.Fragment>
+        <Menu
+          width={this.state.width >= 400 ? "400px" : "85%"}
+          isOpen={this.state.isDrawerOpen}
+          onStateChange={state => { this.setState({ isDrawerOpen: state.isOpen }); }}
+        >
+          <h1>Mandelbrot</h1>
+          <div>
+            <h2>Iterations</h2>
+            <input
+              type="range"
+              className="slider"
+              min="1"
+              max="3000"
+              value={this.state.maxIterations}
+              onChange={(e: React.FormEvent<HTMLInputElement>) =>
+                this.updateUniforms(this.state.colorScheme, parseInt(e.currentTarget.value))}
+            />
+          </div>
+          <div>
+            <h2>Color scheme</h2>
+            {radioButtons}
+          </div>
+        </Menu>
+        <div id="canvas-div">
         </div>
-        <div>
-          <h2>Color scheme</h2>
-          {radioButtons}
+        <div id="controls-container">
+          <FullscreenButton />
         </div>
-      </Menu>,
-      <div id="canvas-div">
-      </div>,
-      <div id="controls-container">
-        <FullscreenButton />
-      </div>
-    ];
+      </React.Fragment>);
   }
 }

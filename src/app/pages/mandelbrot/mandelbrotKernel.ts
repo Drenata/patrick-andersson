@@ -40,13 +40,10 @@ export function createMandelbrotKernel(gpu: GPU, output: { x: number, y: number 
       const q = iteration / maxIterations;
       if (colorScheme == 0) {
         if (q >= 1)
-          // @ts-ignore
           this.color(0, 0, 0);
         else if (q > 0.5)
-          // @ts-ignore
           this.color(q, 1, q);
         else
-          // @ts-ignore
           this.color(0.1, q, 0.1);
       } else if (colorScheme == 1) {
         const i = iteration - 16 * Math.floor(iteration / 16);
@@ -69,10 +66,8 @@ export function createMandelbrotKernel(gpu: GPU, output: { x: number, y: number 
         if (i < 16.0 ) color = [106 / 255, 52 / 255, 3 / 255];
         if (q >= 0.99) color = [0,0,0];
 
-        //@ts-ignore
         this.color(color[0], color[1], color[2]);
       } else {
-        //@ts-ignore
         this.color(1 - q, 1 - q, 1 - q);
       }
     }, {
