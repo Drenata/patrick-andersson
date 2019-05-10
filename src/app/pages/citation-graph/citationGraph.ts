@@ -1,6 +1,6 @@
+import * as Viva from "vivagraphjs";
 import { chunk } from '../../util/util';
 
-const Viva: any = require("vivagraphjs");
 
 export interface Author {
   name: string;

@@ -5,6 +5,7 @@ import { CitationGraphContainer } from './pages/citation-graph/CitationGraphCont
 import { LSystemContainer } from './pages/lsystem/LSystemContainer';
 import { MandelbrotContainer } from './pages/mandelbrot/MandelbrotContainer';
 import { HomeBackground } from './pages/start/homeBackground';
+import { NewtonContainer } from "./pages/newton/NewtonContainer";
 
 ReactDOM.render(
   <BrowserRouter>
@@ -13,6 +14,7 @@ ReactDOM.render(
         <Route path="/mandelbrot" component={MandelbrotContainer} />,
         <Route path="/lsystem" component={LSystemContainer} />,
         <Route path="/citation-graph($$.*)*" component={CitationGraphContainer} />,
+        <Route path="/newton" component={NewtonContainer} />,
         <Route component={HomeBackground} />,
       </Switch>
       <div className="projects">
@@ -20,6 +22,7 @@ ReactDOM.render(
         <div><Link to="/mandelbrot">Mandelbrot</Link></div>
         <div><Link to="/lsystem">L-system</Link></div>
         <div><Link to="/citation-graph">Citation graph</Link></div>
+        <div><Link to="/newton">Newton</Link></div>
       </div>
     </div>
   </BrowserRouter>,
