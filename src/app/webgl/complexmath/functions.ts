@@ -2,7 +2,7 @@
  * This file contains source GLSL complex math functions
  */
 
- export const constants = `
+export const constants = `
     #define PI ${Math.PI}
     #define E ${Math.E}
     const vec2 pi = vec2(PI, 0.0);
@@ -28,7 +28,7 @@ export const cpol = `vec2 cpol(float rho, float theta) {
         rho * cos(theta),
         rho * sin(theta)
     );
-}`
+}`;
 
 export const carg = `float carg(vec2 a) {
     return atan(a.y, a.x);
@@ -165,52 +165,51 @@ export const cacsc = `vec2 cacsc(vec2 a) {
     return casin(cdiv(one, a));
 }`;
 
-
 export const cpow = `vec2 cpow(vec2 a, vec2 exp) {
     return cexp(cmul(exp, cln(a)));
 }`;
 
 export function getAll() {
     return {
-        "constants": constants,
+        constants,
 
-        "cpol": cpol,
-        "carg": carg,
-        "cconj": cconj,
-        "cabs": cabs,
+        cpol,
+        carg,
+        cconj,
+        cabs,
 
-        "cmul": cmul,
-        "cdiv": cdiv,
+        cmul,
+        cdiv,
 
-        "cexp": cexp,
-        "cln": cln,
+        cexp,
+        cln,
 
-        "csqrt": csqrt,
-        "cpow": cpow,
+        csqrt,
+        cpow,
 
-        "sinh": sinh,
-        "cosh": cosh,
+        sinh,
+        cosh,
 
-        "csin": csin,
-        "casin": casin,
-        "csinh": csinh,
+        csin,
+        casin,
+        csinh,
 
-        "ccos": ccos,
-        "cacos": cacos,
-        "ccosh": ccosh,
+        ccos,
+        cacos,
+        ccosh,
 
-        "tanh": tanh,
-        "ctan": ctan,
-        "catan": catan,
-        "ctanh": ctanh,
+        tanh,
+        ctan,
+        catan,
+        ctanh,
 
-        "ccot": ccot,
-        "cacot": cacot,
+        ccot,
+        cacot,
 
-        "csec": csec,
-        "casec": casec,
+        csec,
+        casec,
 
-        "ccsc": ccsc,
-        "cacsc": cacsc,
+        ccsc,
+        cacsc,
     };
 }

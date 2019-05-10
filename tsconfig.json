@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
       "baseUrl": ".",
-      "paths": { "*": ["types/*"] },
+      "paths": { "*": ["src/types/*"] },
       "outDir": "./dist/",
       "target": "es5",
       "sourceMap": true,

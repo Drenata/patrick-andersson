@@ -1,4 +1,4 @@
-import { Kernel } from 'gpu.js';
+import { Kernel } from "gpu.js";
 
 /**
  * Workaround to resize a graphical kernel
@@ -9,14 +9,14 @@ import { Kernel } from 'gpu.js';
  */
 export function resizeGraphicalKernel(kernel: Kernel, width: number, height: number) {
     kernel.context.viewport(0, 0, width, height);
-    //@ts-ignore
+    // @ts-ignore
     kernel.texSize = [width, height];
-    //@ts-ignore
+    // @ts-ignore
     kernel.maxTexSize = [width, height];
-    //@ts-ignore
+    // @ts-ignore
     kernel.framebuffer.width = width;
-    //@ts-ignore
+    // @ts-ignore
     kernel.framebuffer.height = height;
-    //@ts-ignore
+    // @ts-ignore
     kernel.threadDim = [width, height, 1];
 }

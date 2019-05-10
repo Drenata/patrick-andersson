@@ -6,24 +6,25 @@
  * http://www.firstpr.com.au/dsp/rand31/
  */
 export class Random {
-  _seed: number;
+    seed: number;
 
-  constructor(seed: number) {
-    this._seed = seed % 2147483647;
-    if (this._seed <= 0)
-      this._seed += 2147483646;
-  }
-  /**
-   * Returns a pseudo-random value between 1 and 2^32 - 2.
-   */
-  next(): number {
-    return this._seed = this._seed * 16807 % 2147483647;
-  }
-  /**
-   * Returns a pseudo-random floating point number in range [0, 1).
-   */
-  nextFloat(): number {
-    // We know that result of next() will be 1 to 2147483646 (inclusive).
-    return (this.next() - 1) / 2147483646;
-  }
+    constructor(seed: number) {
+        this.seed = seed % 2147483647;
+        if (this.seed <= 0) {
+            this.seed += 2147483646;
+        }
+    }
+    /**
+     * Returns a pseudo-random value between 1 and 2^32 - 2.
+     */
+    next(): number {
+        return this.seed = this.seed * 16807 % 2147483647;
+    }
+    /**
+     * Returns a pseudo-random floating point number in range [0, 1).
+     */
+    nextFloat(): number {
+        // We know that result of next() will be 1 to 2147483646 (inclusive).
+        return (this.next() - 1) / 2147483646;
+    }
 }

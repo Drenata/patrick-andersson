@@ -28,6 +28,10 @@ h2 {
   margin: 0.17em 0;
 }
 
+h3 {
+  margin: 0.3em 0;
+}
+
 ul {
   list-style-position: inside;
   padding-bottom: 1em;
@@ -141,6 +145,7 @@ nav {
   min-height: 200px;
   margin: 0 auto;
   padding: 30px;
+  overflow: auto;
 }
 
 .normal-btn > svg {
@@ -248,14 +253,10 @@ input[type="input"].short-input {
   line-height: 0.8em;
 }
 
-.visualization-command::before {
-  content: " → ";
-}
-
 .visualization-command input[type=text] {
   width: 1.8em;
   text-align: center;
-  padding: 0.48em 0.4em 0.32em 0.4em !important;
+  padding: 0.28em 0.4em 0.32em 0.4em !important;
 }
 
 .visualization-command {
@@ -271,6 +272,13 @@ input[type="input"].short-input {
 .visualization-rule-controls a {
   padding: 0 0.1em;
 }
+
+.visualization-command select {
+    border: 2px solid #77797A;
+    border-radius: 5px;
+    padding: 0.4em;
+    margin: 0.2em 0.2em 0.2em 0;
+  }
 
 /*****************
     Side bar

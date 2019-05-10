@@ -1,62 +1,48 @@
 import * as React from "react";
 
 export interface SliderProps {
-  min: number,
-  max: number,
-  step?: number;
-  initialValue: number,
-  id?: string,
-  onInput: (event: React.FormEvent<HTMLInputElement>) => void
+    min: number;
+    max: number;
+    step?: number;
+    initialValue: number;
+    id?: string;
+    onInput: (event: React.FormEvent<HTMLInputElement>) => void;
 }
 
 export interface SliderState {
-  value: number,
+    value: number;
 }
 
 export class Slider extends React.Component<SliderProps, SliderState> {
 
-  constructor(props: SliderProps) {
-    super(props);
+    constructor(props: SliderProps) {
+        super(props);
 
-    this.state = {
-      value: this.props.initialValue,
+        this.state = {
+            value: this.props.initialValue,
+        };
+
+        this.onChange = this.onChange.bind(this);
     }
 
-    this.onChange = this.onChange.bind(this);
-  }
+    onChange(event: React.FormEvent<HTMLInputElement>) {
+        this.setState({ value: parseFloat(event.currentTarget.value) });
+    }
 
-  onChange(event: React.FormEvent<HTMLInputElement>) {
-    this.setState({ value: parseFloat(event.currentTarget.value) });
-  }
-
-  render() {
-    return (
-      <input
-        key={this.props.id}
-        type="range"
-        min={this.props.min}
-        max={this.props.max}
-        step={this.props.step || 1}
-        value={this.state.value}
-        className="slider"
-        id={this.props.id}
-        onInput={this.props.onInput}
-        onChange={this.onChange}
-      />);
-  }
-
-}
-
-export class SliderWithDisplay extends Slider {
-  render() {
-    return [
-      super.render(),
-      <div style={{
-        display: "inline-block",
-        verticalAlign: "super",
-        paddingLeft: "1em",
-        width: "20%"
-      }}>{this.state.value}</div>
-    ] as any;
-  }
+    render() {
+        return (
+            <input
+                key={this.props.id}
+                type="range"
+                min={this.props.min}
+                max={this.props.max}
+                step={this.props.step || 1}
+                value={this.state.value}
+                className="slider"
+                id={this.props.id}
+                onInput={this.props.onInput}
+                onChange={this.onChange}
+            />
+        );
+    }
 }

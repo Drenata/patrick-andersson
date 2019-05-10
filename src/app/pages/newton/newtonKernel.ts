@@ -1,8 +1,8 @@
 import { GPU, IKernelFunctionThis } from "gpu.js";
 import { derivative, parse } from "mathjs";
-import { HSV2RGB } from '../../webgl/color';
+import { HSV2RGB } from "../../webgl/color";
 import { compileToGLSL, getDependantVariable } from "../../webgl/complexmath/compile";
-import { getAll } from '../../webgl/complexmath/functions';
+import { getAll } from "../../webgl/complexmath/functions";
 
 function mainFunc() {
     return `vec3 findRootColor(vec2 coord, int maxIter) {
@@ -53,22 +53,22 @@ function findRoots(
     scaleY: number,
     maxIterations: number) {
 
-        let i = this.thread.x;
-        let j = this.thread.y!;
+    const i = this.thread.x;
+    const j = this.thread.y!;
 
-        let x = i;
-        let y = j - wh;
-        x *= scaleX;
-        y *= scaleY;
-        x += offsetX;
-        y += offsetY;
+    let x = i;
+    let y = j - wh;
+    x *= scaleX;
+    y *= scaleY;
+    x += offsetX;
+    y += offsetY;
 
-    //@ts-ignore
-    const color = findRootColor([x, y], maxIterations);
+    // @ts-ignore
+    const color = findRootColor([x, y], maxIterations); // eslint-disable-line
     this.color(color[0], color[1], color[2], 1);
 }
 
-export function newtonKernel(gpu: GPU, expr: string, output: { x: number, y: number }) {
+export function newtonKernel(gpu: GPU, expr: string, output: { x: number; y: number }) {
 
     const fExpr = parse(expr);
 
