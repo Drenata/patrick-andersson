@@ -278,7 +278,8 @@ input[type="input"].short-input {
     border-radius: 5px;
     padding: 0.4em;
     margin: 0.2em 0.2em 0.2em 0;
-  }
+}
+
 
 /*****************
     Side bar
@@ -311,10 +312,21 @@ input[type="input"].short-input {
 }
 
 .bm-item select {
+  background-color: #0000;
   border: 2px solid #77797A;
   border-radius: 5px;
   padding: 0.4em;
   margin: 0.2em 0.2em 0.2em 0;
+}
+
+.bm-item input {
+    font-size: 16px;
+    padding: 0.4em;
+    margin: 0.2em 0;
+    background-color: #373a47;
+    border: 2px solid #77797a;
+    border-radius: 5px;
+    vertical-align: baseline;
 }
 
 .bm-item label {

@@ -16,6 +16,9 @@ interface NewtonState extends CameraState {
     texExpr: string;
     dTexExpr: string;
     maxIterations: number;
+    method: number;
+    a: [string, string];
+    c: [string, string];
     isLoading: boolean;
 }
 
@@ -42,6 +45,9 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
             dTexExpr: "3 \\cdot z^2",
             isLoading: false,
             maxIterations: 100,
+            method: 1,
+            a: ["1", "0"],
+            c: ["0", "0"],
             offsetX: 1.2 * initialScale * -window.innerWidth / 2,
             offsetY: initialScale * window.innerHeight / 2,
             scaleX: initialScale,
@@ -98,7 +104,13 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
                     this.state.width, this.state.height,
                     this.state.offsetX, this.state.offsetY,
                     this.state.scaleX, this.state.scaleY,
-                    this.state.maxIterations);
+                    this.state.maxIterations,
+                    this.state.method,
+                    parseFloat(this.state.a[0]),
+                    parseFloat(this.state.a[1]),
+                    parseFloat(this.state.c[0]),
+                    parseFloat(this.state.c[1])
+                );
                 this.invalidated = false;
             }
             requestAnimationFrame(() => this.update());
@@ -146,7 +158,13 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
                 this.state.width, this.state.height,
                 this.state.offsetX, this.state.offsetY,
                 this.state.scaleX, this.state.scaleY,
-                this.state.maxIterations);
+                this.state.maxIterations,
+                this.state.method,
+                parseFloat(this.state.a[0]),
+                parseFloat(this.state.a[1]),
+                parseFloat(this.state.c[0]),
+                parseFloat(this.state.c[1])
+            );
         } catch (err) {
             this.setState({ errorText: err.message || err });
             return;
@@ -165,6 +183,12 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
                     // tslint:disable-next-line: max-line-length
                     onMaxIterationsChange={e => this.setState({ maxIterations: parseInt(e.currentTarget.value) }, () => this.invalidated = true)}
                     maxIterations={this.state.maxIterations}
+                    method={this.state.method}
+                    onMethodChange={newMethod => this.setState({ method: parseInt(newMethod) }, () => this.invalidated = true)}
+                    a={this.state.a}
+                    onaChange={newA => this.setState({ a: newA }, () => this.invalidated = true)}
+                    c={this.state.c}
+                    oncChange={newC => this.setState({ c: newC }, () => this.invalidated = true)}
                 />
                 <div id="canvas-div" />
                 <NewtonModal
@@ -175,7 +199,6 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
                     differentiatedTexExpression={this.state.dTexExpr}
                     errorText={this.state.errorText}
                     onClose={() => this.setState({ showModal: false })}
-
                 />
                 <div id="controls-container">
                     <FullscreenButton />
