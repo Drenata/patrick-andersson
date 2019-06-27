@@ -165,14 +165,15 @@ export function newtonKernel(gpu: GPU, expr: string, output: { x: number; y: num
 
     gpu.addNativeFunction("findRootColor", customCode);
 
-    return gpu.createKernel(findRoots)
-        .setOutput(output)
+    return gpu.createKernel(findRoots, {
+        output: output
+    })
         .setGraphical(true)
         .setArgumentTypes(
             [
-                "Number", "Number", "Number", "Number",
-                "Number", "Number", "Integer", "Integer",
-                "Number", "Number", "Number", "Number"
+                "Float", "Float", "Float", "Float",
+                "Float", "Float", "Integer", "Integer",
+                "Float", "Float", "Float", "Float"
             ]
         );
 }

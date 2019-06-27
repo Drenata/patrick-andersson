@@ -1,6 +1,6 @@
 import { GPU } from "gpu.js";
 
-export function createMandelbrotKernel(gpu: GPU, output: { x: number; y: number }) {
+export function createMandelbrotKernel(gpu: GPU, resolution: [number, number]) {
     return gpu.createKernel(
         function mandelbrot(
             ww: number,
@@ -69,10 +69,10 @@ export function createMandelbrotKernel(gpu: GPU, output: { x: number; y: number 
                 this.color(1 - q, 1 - q, 1 - q);
             }
         }, {
-            output,
             precision: "single",
             graphical: true,
             immutable: true,
-        });
+            dynamicOutput: true
+        }).setOutput(resolution);
 
 }
