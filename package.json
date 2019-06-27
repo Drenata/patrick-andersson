@@ -30,7 +30,7 @@
     "@types/react-router-dom": "^4.3.2",
     "@types/screenfull": "^3.3.3",
     "@types/three": "^0.92.25",
-    "gpu.js": "^2.0.0-rc.13",
+    "gpu.js": "^2.0.0-rc.17",
     "gpucomputationrender-three": "^2.0.0",
     "katex": "^0.10.1",
     "mathjs": "^5.9.0",
