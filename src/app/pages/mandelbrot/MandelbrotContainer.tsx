@@ -71,10 +71,14 @@ export class MandelbrotContainer extends React.Component<{}, MandelbrotState, an
             mode: "webgl",
         });
         this.kernel = createMandelbrotKernel(this.gpu,
-            {
-                x: window.screen.availWidth,
-                y: window.screen.availHeight,
-            });
+            [this.state.width, this.state.height]
+        );
+        this.kernel.build(
+            this.state.width, this.state.height,
+            this.state.offsetX, this.state.offsetY,
+            this.state.scaleX, this.state.scaleY,
+            this.state.maxIterations, this.state.colorScheme
+        );
 
         this.kernel.build(
             this.state.width, this.state.height,
@@ -96,7 +100,8 @@ export class MandelbrotContainer extends React.Component<{}, MandelbrotState, an
                     this.state.width, this.state.height,
                     this.state.offsetX, this.state.offsetY,
                     this.state.scaleX, this.state.scaleY,
-                    this.state.maxIterations, this.state.colorScheme);
+                    this.state.maxIterations, this.state.colorScheme
+                );
                 this.invalidated = false;
             }
             requestAnimationFrame(() => this.update());

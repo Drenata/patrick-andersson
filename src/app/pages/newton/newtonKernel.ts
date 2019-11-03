@@ -164,8 +164,9 @@ export function newtonKernel(gpu: GPU, expr: string, output: number[]) {
 
     gpu.addNativeFunction("findRootColor", customCode);
 
-    return gpu.createKernel(findRoots)
-        .setOutput(output)
+    return gpu.createKernel(findRoots, {
+        output: output
+    })
         .setGraphical(true)
         .setDynamicOutput(true)
         // @ts-ignore
