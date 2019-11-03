@@ -73,6 +73,7 @@ export function createMandelbrotKernel(gpu: GPU, output: { x: number; y: number 
             precision: "single",
             graphical: true,
             immutable: true,
+            dynamicOutput: true,
         });
 
 }

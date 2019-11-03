@@ -109,7 +109,6 @@ function mainFunc() {
 
 function findRoots(
     this: IKernelFunctionThis,
-    ww: number,
     wh: number,
     offsetX: number,
     offsetY: number,
@@ -138,7 +137,7 @@ function findRoots(
     this.color(color[0], color[1], color[2], 1);
 }
 
-export function newtonKernel(gpu: GPU, expr: string, output: { x: number; y: number }) {
+export function newtonKernel(gpu: GPU, expr: string, output: number[]) {
 
     const fExpr = parse(expr);
 
@@ -168,11 +167,7 @@ export function newtonKernel(gpu: GPU, expr: string, output: { x: number; y: num
     return gpu.createKernel(findRoots)
         .setOutput(output)
         .setGraphical(true)
-        .setArgumentTypes(
-            [
-                "Number", "Number", "Number", "Number",
-                "Number", "Number", "Integer", "Integer",
-                "Number", "Number", "Number", "Number"
-            ]
-        );
+        .setDynamicOutput(true)
+        // @ts-ignore
+        .setArgumentTypes(["Integer", "Float", "Float", "Float", "Float", "Integer", "Integer", "Float", "Float", "Float", "Float"]);
 }

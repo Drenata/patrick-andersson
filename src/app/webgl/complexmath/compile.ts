@@ -40,18 +40,18 @@ enum MathSymbol {
 }
 
 function toOp(op: string | undefined): Operator {
-    if (!Object.values(Operator).includes(op)) { throw new Error("Unsupported operator " + op); }
-    return Operator[op as keyof typeof Operator];
+    if (!Object.values(Operator).includes(op as Operator)) { throw new Error("Unsupported operator " + op); }
+    return Operator[op as Operator];
 }
 
 function toFunction(func: string | undefined): MathFunction {
-    if (!Object.values(MathFunction).includes(func)) { throw new Error("Unsupported function " + func); }
-    return MathFunction[func as keyof typeof MathFunction];
+    if (!Object.values(MathFunction).includes(func as MathFunction)) { throw new Error("Unsupported function " + func); }
+    return MathFunction[func as MathFunction];
 }
 
 function toSymbol(symb: string | undefined): MathSymbol | undefined {
-    if (!Object.values(MathSymbol).includes(symb)) { return undefined; }
-    return MathSymbol[symb as keyof typeof MathSymbol];
+    if (!Object.values(MathSymbol).includes(symb as MathSymbol)) { return undefined; }
+    return MathSymbol[symb as MathSymbol];
 }
 
 export function getDependantVariable(expr: MathNode) {
@@ -59,7 +59,7 @@ export function getDependantVariable(expr: MathNode) {
         n.isSymbolNode && path !== "fn",
     )
         .map(n => n.name!)))
-        .filter(c => !Object.values(MathSymbol).includes(c));
+        .filter(c => !Object.values(MathSymbol).includes(c as MathSymbol));
 
     if (variables.length < 1) { throw new Error("No variable in expression"); }
     if (variables.length > 1) { throw new Error("Too many variables in expression"); }

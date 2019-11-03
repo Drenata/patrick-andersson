@@ -74,7 +74,7 @@ export const CitationGraphMenu = (props: {
         </a>
         <div>
             The data used in this graph is from <a href="http://semanticscholar.org">Semantic Scholar</a>.
-    The graph library used is <a href="https://github.com/anvaka/VivaGraphJS">VivaGraphJS</a>.
+            The graph library used is <a href="https://github.com/anvaka/VivaGraphJS">VivaGraphJS</a>.
         </div>
     </Menu>
 );

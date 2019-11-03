@@ -6,6 +6,10 @@ module.exports = {
         path: __dirname + "/dist"
     },
 
+    node: {
+        fs: "empty"
+    },
+
     // Enable sourcemaps for debugging webpack's output.
     devtool: "inline-source-map",
 

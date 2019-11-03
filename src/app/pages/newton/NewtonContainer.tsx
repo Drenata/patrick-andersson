@@ -3,7 +3,6 @@ import { derivative, parse as mathParse } from "mathjs";
 import * as React from "react";
 import { FullscreenButton, ResetButton } from "../../components/buttons";
 import { CameraState, panzoomWrapper } from "../../util/panzoomWrapper";
-import { resizeGraphicalKernel } from "../../webgl/gpujs";
 import { newtonKernel } from "./newtonKernel";
 import { NewtonMenu } from "./NewtonMenu";
 import { NewtonModal } from "./newtonModal";
@@ -62,9 +61,9 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
         }, () => {
             this.invalidated = true;
 
+            this.kernel.setOutput([this.state.width, this.state.height]);
             this.canvas.width = this.state.width;
             this.canvas.height = this.state.height;
-            resizeGraphicalKernel(this.kernel, this.state.width, this.state.height);
         });
     }
 
@@ -82,7 +81,6 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
         this.gpu = new GPU({
             canvas: this.canvas,
             mode: "webgl",
-            format: "Float32Array",
         });
 
         window.addEventListener("resize", this.onWindowResize.bind(this, false));
@@ -101,7 +99,7 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
         if (this.active && this.canvas) {
             if (this.invalidated && this.kernel) {
                 this.kernel.run(
-                    this.state.width, this.state.height,
+                    this.state.height,
                     this.state.offsetX, this.state.offsetY,
                     this.state.scaleX, this.state.scaleY,
                     this.state.maxIterations,
@@ -150,12 +148,22 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
                 this.gpu.nativeFunctions = [];
             }
 
-            this.kernel = newtonKernel(this.gpu, this.state.expr, {
-                x: this.state.width,
-                y: this.state.height,
-            });
+            this.kernel = newtonKernel(this.gpu, this.state.expr,
+                [this.state.width, this.state.height]
+            );
+            this.kernel.build(
+                this.state.height,
+                this.state.offsetX, this.state.offsetY,
+                this.state.scaleX, this.state.scaleY,
+                this.state.maxIterations,
+                this.state.method,
+                parseFloat(this.state.a[0]),
+                parseFloat(this.state.a[1]),
+                parseFloat(this.state.c[0]),
+                parseFloat(this.state.c[1])
+            );
             this.kernel.run(
-                this.state.width, this.state.height,
+                this.state.height,
                 this.state.offsetX, this.state.offsetY,
                 this.state.scaleX, this.state.scaleY,
                 this.state.maxIterations,
