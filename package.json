@@ -1,59 +1,63 @@
 {
   "name": "patrick-andersson",
-  "version": "1.0.0",
-  "description": "",
-  "main": "bg.js",
-  "scripts": {
-    "start": "",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prod": "webpack --config webpack.config.js",
-    "dev": "webpack --config webpack.dev.config.js",
-    "lint": "eslint \"./src/**\""
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Drenata/patrick-andersson.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Drenata/patrick-andersson/issues"
-  },
-  "homepage": "https://github.com/Drenata/patrick-andersson#readme",
+  "version": "2.0.0",
+  "private": true,
   "dependencies": {
     "@matejmazur/react-katex": "^3.0.2",
+    "@testing-library/jest-dom": "^5.11.6",
+    "@testing-library/react": "^11.1.2",
+    "@testing-library/user-event": "^12.2.2",
+    "@types/jest": "^26.0.15",
     "@types/katex": "^0.10.2",
     "@types/mathjs": "^5.0.1",
-    "@types/react": "^16.9.11",
+    "@types/node": "^12.19.4",
+    "@types/react": "^16.9.56",
     "@types/react-burger-menu": "^2.2.5",
-    "@types/react-dom": "^16.9.3",
+    "@types/react-dom": "^16.9.9",
     "@types/react-router-dom": "^4.3.5",
     "@types/screenfull": "^3.3.3",
     "@types/three": "^0.92.25",
-    "gpu.js": "^2.2.1",
+    "gpu.js": "^2.10.0",
     "katex": "^0.10.2",
     "mathjs": "^5.10.3",
-    "pan-zoom": "^3.5.0",
-    "react": "^16.11.0",
-    "react-burger-menu": "^2.6.11",
-    "react-dom": "^16.11.0",
+    "pan-zoom": "^3.5.1",
+    "react": "^17.0.1",
+    "react-burger-menu": "^2.9.0",
+    "react-dom": "^17.0.1",
     "react-router-dom": "^4.3.1",
+    "react-scripts": "4.0.0",
     "screenfull": "^4.2.1",
     "simplex-noise": "^2.4.0",
     "three": "^0.94.0",
     "three-orbitcontrols-ts": "^0.1.2",
     "three.map.control": "^1.6.0",
-    "typescript": "^3.6.4",
+    "typescript": "^4.0.5",
     "vivagraphjs": "^0.10.1",
+    "web-vitals": "^0.2.4",
     "webpack": "^4.41.2"
   },
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^1.13.0",
-    "@typescript-eslint/parser": "^1.13.0",
-    "awesome-typescript-loader": "^5.2.1",
-    "eslint": "^5.16.0",
-    "eslint-plugin-react": "^7.16.0",
-    "source-map-loader": "^0.2.4",
-    "webpack-cli": "^3.3.10"
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
