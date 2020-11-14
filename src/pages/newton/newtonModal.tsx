@@ -19,10 +19,10 @@ export function NewtonModal(props: {
                 math="z_{t+1} \gets z_t - \frac{f(z)}{f^\prime(z)}"
                 block={true}
             />
-            <p>to points in the complex plane <TeX math="z_0" />.
+            <p>to points in the complex plane.
             By coloring each point according to the root found and number of iterations required,
             interesting images emerge.
-            Enter some function, press compile and then go!</p>
+            Enter some function, and press explore!</p>
             <div style={{ margin: "0 auto", width: "288px" }}>
                 <input
                     className="text-input"

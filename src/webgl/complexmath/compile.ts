@@ -72,11 +72,11 @@ function operatorAsGLSL(
     op: Operator,
 ): string {
 
-    if (args == undefined) {
+    if (args === undefined) {
         throw new Error("Invalid arguments for op " + op);
     }
 
-    if (args.length == 1) {
+    if (args.length === 1) {
         const arg = args[0];
         switch (op) {
             case Operator["-"]:
@@ -84,7 +84,7 @@ function operatorAsGLSL(
             default:
                 throw new Error("Unimplemented operation " + op + " with 1 argument " + arg);
         }
-    } else if (args.length == 2) {
+    } else if (args.length === 2) {
         const [arg1, arg2] = args;
         switch (op) {
             case Operator["+"]:
@@ -157,7 +157,7 @@ function functionAsGLSL(
     func: MathFunction,
 ): string {
 
-    if (args == undefined) {
+    if (args === undefined) {
         throw new Error("Invalid arguments " + args);
     }
 
