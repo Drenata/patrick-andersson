@@ -1,11 +1,16 @@
 import { GPU, Kernel } from "gpu.js";
+import createPanZoom, { PanZoom } from "panzoom";
 import * as React from "react";
 import { slide as Menu } from "react-burger-menu";
 import { FullscreenButton } from "../../components/buttons";
-import { CameraState, panzoomWrapper } from "../../util/panzoomWrapper";
 import { createMandelbrotKernel } from "./mandelbrotKernel";
 
-interface MandelbrotState extends CameraState {
+interface MandelbrotState {
+    width: number;
+    height: number;
+    offsetX: number;
+    offsetY: number;
+    scale: number;
     isDrawerOpen: boolean;
     maxIterations: number;
     colorScheme: number;
@@ -20,6 +25,7 @@ export class MandelbrotContainer extends React.Component<{}, MandelbrotState, an
     gpu?: GPU;
     kernel?: Kernel;
     cleanup: (() => void)[] = [];
+    controls?: PanZoom;
 
     constructor(props: {}) {
         super(props);
@@ -34,8 +40,7 @@ export class MandelbrotContainer extends React.Component<{}, MandelbrotState, an
             maxIterations: 700,
             offsetX: 1.2 * initialScale * -window.innerWidth / 2,
             offsetY: initialScale * window.innerHeight / 2,
-            scaleX: initialScale,
-            scaleY: initialScale,
+            scale: initialScale,
         };
     }
 
@@ -62,9 +67,28 @@ export class MandelbrotContainer extends React.Component<{}, MandelbrotState, an
                 document.createElement("canvas"),
             );
 
-        //this.cleanup.push(
-        panzoomWrapper(this, this.canvas, () => this.invalidated = true);
-        //);
+        this.controls = createPanZoom(
+            document.getElementById("panzoom-proxy")!,
+            {
+                smoothScroll: false, initialZoom: 300,
+                initialX: -window.innerWidth / 600,
+                initialY: -window.innerHeight / 600,
+                filterKey: () => true,
+                enableTextSelection: true,
+                disableKeyboardInteraction: false,
+            }
+        )
+        this.controls.on("transform", (e) => {
+            const transform = this.controls!.getTransform();
+            this.setState({
+                offsetX: -transform.x,
+                offsetY: transform.y,
+                scale: transform.scale,
+            }, () => {
+                this.invalidated = true;
+                document.getElementById("panzoom-proxy")!.style.transform = "";
+            });
+        });
 
         this.gpu = new GPU({
             canvas: this.canvas,
@@ -76,7 +100,7 @@ export class MandelbrotContainer extends React.Component<{}, MandelbrotState, an
         this.kernel.build.apply(this.kernel,
             [this.state.width, this.state.height,
             this.state.offsetX, this.state.offsetY,
-            this.state.scaleX, this.state.scaleY,
+            this.state.scale,
             this.state.maxIterations, this.state.colorScheme]
         );
 
@@ -93,7 +117,7 @@ export class MandelbrotContainer extends React.Component<{}, MandelbrotState, an
                 this.kernel!.run(
                     this.state.width, this.state.height,
                     this.state.offsetX, this.state.offsetY,
-                    this.state.scaleX, this.state.scaleY,
+                    this.state.scale,
                     this.state.maxIterations, this.state.colorScheme
                 );
                 this.invalidated = false;
@@ -108,6 +132,7 @@ export class MandelbrotContainer extends React.Component<{}, MandelbrotState, an
         window.removeEventListener("load", this.onWindowResize);
         this.cleanup.map(c => c());
         this.active = false;
+        this.controls?.dispose();
     }
 
     updateUniforms(colorScheme: number, maxIterations: number) {
@@ -135,7 +160,11 @@ export class MandelbrotContainer extends React.Component<{}, MandelbrotState, an
                 <Menu
                     width={this.state.width >= 400 ? "400px" : "85%"}
                     isOpen={this.state.isDrawerOpen}
-                    onStateChange={state => { this.setState({ isDrawerOpen: state.isOpen }); }}
+                    onStateChange={state => {
+                        if (state.isOpen) this.controls?.pause();
+                        else this.controls?.resume();
+                        this.setState({ isDrawerOpen: state.isOpen });
+                    }}
                 >
                     <h1>Mandelbrot</h1>
                     <div>
@@ -155,6 +184,9 @@ export class MandelbrotContainer extends React.Component<{}, MandelbrotState, an
                     </div>
                 </Menu>
                 <div id="canvas-div" />
+                <div id="panzoom-proxy" style={{
+                    display: "none"
+                }} />
                 <div id="controls-container">
                     <FullscreenButton />
                 </div>

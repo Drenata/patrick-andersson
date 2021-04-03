@@ -128,7 +128,6 @@ export class LSystemContainer extends React.Component<{}, LSystemState> {
         if (this.line) {
             this.scene!.remove(this.line);
             this.line.geometry.dispose();
-            this.line.material.dispose();
         }
         this.lSystem!.evolveTo(0);
         this.line = this.lSystem!.getLine();
@@ -138,7 +137,6 @@ export class LSystemContainer extends React.Component<{}, LSystemState> {
     nextLevel() {
         this.scene!.remove(this.line!);
         this.line!.geometry.dispose();
-        this.line!.material.dispose();
         this.lSystem!.produce();
         this.line = this.lSystem!.getLine();
         this.scene!.add(this.line);

@@ -1,13 +1,18 @@
 import { GPU, Kernel } from "gpu.js";
 import { derivative, parse as mathParse } from "mathjs";
+import createPanZoom, { PanZoom } from "panzoom";
 import * as React from "react";
 import { FullscreenButton, ResetButton } from "../../components/buttons";
-import { CameraState, panzoomWrapper } from "../../util/panzoomWrapper";
 import { newtonKernel } from "./newtonKernel";
 import { NewtonMenu } from "./NewtonMenu";
 import { NewtonModal } from "./newtonModal";
 
-interface NewtonState extends CameraState {
+interface NewtonState {
+    width: number;
+    height: number;
+    offsetX: number;
+    offsetY: number;
+    scale: number;
     isDrawerOpen: boolean;
     showModal: boolean;
     errorText: string;
@@ -28,6 +33,7 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
     cleanup: (() => void)[] = [];
     gpu?: GPU;
     kernel?: Kernel;
+    controls?: PanZoom;
 
     constructor(props: {}) {
         super(props);
@@ -49,8 +55,7 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
             c: ["0", "0"],
             offsetX: 1.2 * initialScale * -window.innerWidth / 2,
             offsetY: initialScale * window.innerHeight / 2,
-            scaleX: initialScale,
-            scaleY: initialScale,
+            scale: initialScale,
         };
     }
 
@@ -74,9 +79,29 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
                 document.createElement("canvas"),
             );
 
-        //this.cleanup.push(
-        panzoomWrapper(this, this.canvas, () => this.invalidated = true);
-        //);
+        this.controls = createPanZoom(
+            document.getElementById("panzoom-proxy")!,
+            {
+                smoothScroll: false, initialZoom: 300,
+                initialX: -window.innerWidth / 600,
+                initialY: -window.innerHeight / 600,
+                filterKey: () => true,
+                enableTextSelection: true,
+                disableKeyboardInteraction: false,
+            }
+        )
+        this.controls.on("transform", (e) => {
+            const transform = this.controls!.getTransform();
+            this.setState({
+                offsetX: -transform.x,
+                offsetY: transform.y,
+                scale: transform.scale,
+            }, () => {
+                this.invalidated = true;
+                document.getElementById("panzoom-proxy")!.style.transform = "";
+            });
+        });
+        this.controls.pause();
 
         this.gpu = new GPU({
             canvas: this.canvas,
@@ -100,7 +125,7 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
                 this.kernel.run(
                     this.state.height,
                     this.state.offsetX, this.state.offsetY,
-                    this.state.scaleX, this.state.scaleY,
+                    this.state.scale,
                     this.state.maxIterations,
                     this.state.method,
                     parseFloat(this.state.a[0]),
@@ -120,6 +145,7 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
         window.removeEventListener("load", this.onWindowResize);
         this.cleanup.map(c => c());
         this.active = false;
+        this.controls?.dispose();
     }
 
     compile() {
@@ -153,7 +179,7 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
             this.kernel(
                 this.state.height,
                 this.state.offsetX, this.state.offsetY,
-                this.state.scaleX, this.state.scaleY,
+                this.state.scale,
                 this.state.maxIterations,
                 this.state.method,
                 parseFloat(this.state.a[0]),
@@ -176,7 +202,11 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
                 <NewtonMenu
                     width={this.state.width}
                     isOpen={this.state.isDrawerOpen}
-                    onMenuStateChange={state => this.setState({ isDrawerOpen: state.isOpen })}
+                    onMenuStateChange={state => {
+                        if (state.isOpen) this.controls?.pause();
+                        else this.controls?.resume();
+                        this.setState({ isDrawerOpen: state.isOpen });
+                    }}
                     // tslint:disable-next-line: max-line-length
                     onMaxIterationsChange={e => this.setState({ maxIterations: parseInt(e.currentTarget.value) }, () => this.invalidated = true)}
                     maxIterations={this.state.maxIterations}
@@ -188,6 +218,7 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
                     oncChange={newC => this.setState({ c: newC }, () => this.invalidated = true)}
                 />
                 <div id="canvas-div" />
+                <div id="panzoom-proxy" style={{ display: "none" }} />
                 <NewtonModal
                     showModal={this.state.showModal}
                     expression={this.state.expr}
@@ -195,11 +226,17 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
                     texExpression={this.state.texExpr}
                     differentiatedTexExpression={this.state.dTexExpr}
                     errorText={this.state.errorText}
-                    onClose={() => this.setState({ showModal: false })}
+                    onClose={() => {
+                        this.controls?.resume()
+                        this.setState({ showModal: false });
+                    }}
                 />
                 <div id="controls-container">
                     <FullscreenButton />
-                    {!this.state.showModal && <ResetButton onClick={() => this.setState({ showModal: true })} />}
+                    {!this.state.showModal && <ResetButton onClick={() => {
+                        this.controls?.pause();
+                        this.setState({ showModal: true });
+                    }} />}
                 </div>
             </React.Fragment>
         );

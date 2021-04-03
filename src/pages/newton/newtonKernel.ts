@@ -112,8 +112,7 @@ function findRoots(
     wh: number,
     offsetX: number,
     offsetY: number,
-    scaleX: number,
-    scaleY: number,
+    scale: number,
     maxIterations: number,
     method: number,
     a1: number,
@@ -125,12 +124,10 @@ function findRoots(
     const i = this.thread.x;
     const j = this.thread.y!;
 
-    let x = i;
-    let y = j - wh;
-    x *= scaleX;
-    y *= scaleY;
-    x += offsetX;
-    y += offsetY;
+    let x = i + offsetX;
+    let y = j - wh + offsetY;
+    x /= scale;
+    y /= scale;
 
     // @ts-ignore
     const color = findRootColor([x, y], maxIterations, method, [a1, a2], [c1, c2]); // eslint-disable-line
@@ -170,5 +167,5 @@ export function newtonKernel(gpu: GPU, expr: string, output: number[]) {
         .setGraphical(true)
         .setDynamicOutput(true)
         // @ts-ignore
-        .setArgumentTypes(["Integer", "Float", "Float", "Float", "Float", "Integer", "Integer", "Float", "Float", "Float", "Float"]);
+        .setArgumentTypes(["Integer", "Float", "Float", "Float", "Integer", "Integer", "Float", "Float", "Float", "Float"]);
 }

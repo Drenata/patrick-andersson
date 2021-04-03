@@ -6,18 +6,17 @@ function manbelbrotKernelCode(
     wh: number,
     offsetX: number,
     offsetY: number,
-    scaleX: number,
-    scaleY: number,
+    scale: number,
     maxIterations: number,
     colorScheme: number,
 ) {
 
-    let x0 = this.thread.x;
-    let y0 = this.thread.y! - wh;
-    x0 *= scaleX;
-    y0 *= scaleY;
-    x0 += offsetX;
-    y0 += offsetY;
+    // Normalized coordinates [-0.5, 0.5]
+    let x0 = (this.thread.x + offsetX);
+    let y0 = (this.thread.y! - wh + offsetY);
+
+    x0 /= scale;
+    y0 /= scale;
     let x = 0;
     let y = 0;
 
