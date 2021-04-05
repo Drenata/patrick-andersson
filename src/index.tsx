@@ -5,6 +5,7 @@ import './index.css';
 import { CitationGraphContainer } from './pages/citation-graph/CitationGraphContainer';
 import { LSystemContainer } from './pages/lsystem/LSystemContainer';
 import { MandelbrotContainer } from './pages/mandelbrot/MandelbrotContainer';
+import { NetKreContainer } from './pages/netkre/NetKreContainer';
 import { NewtonContainer } from './pages/newton/NewtonContainer';
 import { HomeBackground } from './pages/start/homeBackground';
 import reportWebVitals from './reportWebVitals';
@@ -18,6 +19,7 @@ ReactDOM.render(
                 <Route path="/lsystem" component={LSystemContainer} />,
                 <Route path="/citation-graph($$.*)*" component={CitationGraphContainer} />,
                 <Route path="/newton" component={NewtonContainer} />,
+                <Route path="/netkre" component={NetKreContainer} />,
                 <Route component={HomeBackground} />,
             </Switch>
         <div className="projects">
@@ -26,6 +28,7 @@ ReactDOM.render(
           <div><Link to="/lsystem">L-system</Link></div>
           <div><Link to="/citation-graph">Citation graph</Link></div>
           <div><Link to="/newton">Newton</Link></div>
+          <div><Link to="/netkre">NetKre</Link></div>
         </div>
       </div>
     </BrowserRouter>
