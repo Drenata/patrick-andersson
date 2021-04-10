@@ -176,6 +176,12 @@ nav {
   cursor: pointer;
 }
 
+.diagram-container {
+  width: 100%;
+  height: 100%;
+  color: white;
+}
+
 .slidercontainer {
   height: 60vh;
   display: flex;
