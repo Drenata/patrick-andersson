@@ -19,7 +19,7 @@
     "@types/three": "^0.92.25",
     "gpu.js": "^2.10.0",
     "katex": "^0.10.2",
-    "mathjs": "^5.10.3",
+    "mathjs": "^7.5.1",
     "pan-zoom": "^3.5.1",
     "react": "^17.0.1",
     "react-burger-menu": "^2.9.0",
