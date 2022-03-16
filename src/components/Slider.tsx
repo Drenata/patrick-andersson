@@ -14,7 +14,6 @@ export interface SliderState {
 }
 
 export class Slider extends React.Component<SliderProps, SliderState> {
-
     constructor(props: SliderProps) {
         super(props);
 

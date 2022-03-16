@@ -33,7 +33,7 @@ export class Rain implements Background {
                 this.drops.push(this.drop());
             }
         }
-    }
+    };
 
     optionControls = () => {
         return (
@@ -50,12 +50,14 @@ export class Rain implements Background {
                 </div>
             </div>
         );
-    }
+    };
 
     *drop() {
         const waitIter = this.random.nextFloat() * 500;
 
-        for (let i = 0; i < waitIter; i++) { yield; }
+        for (let i = 0; i < waitIter; i++) {
+            yield;
+        }
 
         const x = this.random.nextFloat() * this.width!;
         const y = this.random.nextFloat() * this.height!;
@@ -69,7 +71,11 @@ export class Rain implements Background {
         const size = this.random.nextFloat() * (0.000125558 * this.width! * this.height!) + 50;
         const speed = size / 60;
         for (let i = 0; i < size; i += speed) {
-            this.context!.strokeStyle = Color.linearInterpolate(this.beginningColor, this.endColor, i / size).toString();
+            this.context!.strokeStyle = Color.linearInterpolate(
+                this.beginningColor,
+                this.endColor,
+                i / size
+            ).toString();
             this.context!.lineWidth = 2;
             this.context!.beginPath();
             this.context!.arc(x, y, i / 2, 0, 2 * Math.PI);

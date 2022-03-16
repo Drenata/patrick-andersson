@@ -119,9 +119,8 @@ function findRoots(
     a1: number,
     a2: number,
     c1: number,
-    c2: number,
+    c2: number
 ) {
-
     const i = this.thread.x;
     const j = this.thread.y!;
 
@@ -138,7 +137,6 @@ function findRoots(
 }
 
 export function newtonKernel(gpu: GPU, expr: string, output: number[]) {
-
     const fExpr = parse(expr);
 
     const dependantVariable = getDependantVariable(fExpr);
@@ -164,11 +162,26 @@ export function newtonKernel(gpu: GPU, expr: string, output: number[]) {
 
     gpu.addNativeFunction("findRootColor", customCode);
 
-    return gpu.createKernel(findRoots, {
-        output: output
-    })
-        .setGraphical(true)
-        .setDynamicOutput(true)
-        // @ts-ignore
-        .setArgumentTypes(["Integer", "Float", "Float", "Float", "Float", "Integer", "Integer", "Float", "Float", "Float", "Float"]);
+    return (
+        gpu
+            .createKernel(findRoots, {
+                output: output,
+            })
+            .setGraphical(true)
+            .setDynamicOutput(true)
+            // @ts-ignore
+            .setArgumentTypes([
+                "Integer",
+                "Float",
+                "Float",
+                "Float",
+                "Float",
+                "Integer",
+                "Integer",
+                "Float",
+                "Float",
+                "Float",
+                "Float",
+            ])
+    );
 }

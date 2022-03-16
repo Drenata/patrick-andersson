@@ -47,35 +47,34 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
             method: 1,
             a: ["1", "0"],
             c: ["0", "0"],
-            offsetX: 1.2 * initialScale * -window.innerWidth / 2,
-            offsetY: initialScale * window.innerHeight / 2,
+            offsetX: (1.2 * initialScale * -window.innerWidth) / 2,
+            offsetY: (initialScale * window.innerHeight) / 2,
             scaleX: initialScale,
             scaleY: initialScale,
         };
     }
 
     onWindowResize() {
-        this.setState({
-            height: window.innerHeight,
-            width: window.innerWidth,
-        }, () => {
-            this.invalidated = true;
+        this.setState(
+            {
+                height: window.innerHeight,
+                width: window.innerWidth,
+            },
+            () => {
+                this.invalidated = true;
 
-            this.kernel!.setOutput([this.state.width, this.state.height]);
-            this.canvas!.width = this.state.width;
-            this.canvas!.height = this.state.height;
-        });
+                this.kernel!.setOutput([this.state.width, this.state.height]);
+                this.canvas!.width = this.state.width;
+                this.canvas!.height = this.state.height;
+            }
+        );
     }
 
     componentDidMount() {
-        this.canvas = document
-            .getElementById("canvas-div")!
-            .appendChild(
-                document.createElement("canvas"),
-            );
+        this.canvas = document.getElementById("canvas-div")!.appendChild(document.createElement("canvas"));
 
         //this.cleanup.push(
-        panzoomWrapper(this, this.canvas, () => this.invalidated = true);
+        panzoomWrapper(this, this.canvas, () => (this.invalidated = true));
         //);
 
         this.gpu = new GPU({
@@ -99,8 +98,10 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
             if (this.invalidated && this.kernel) {
                 this.kernel.run(
                     this.state.height,
-                    this.state.offsetX, this.state.offsetY,
-                    this.state.scaleX, this.state.scaleY,
+                    this.state.offsetX,
+                    this.state.offsetY,
+                    this.state.scaleX,
+                    this.state.scaleY,
                     this.state.maxIterations,
                     this.state.method,
                     parseFloat(this.state.a[0]),
@@ -118,7 +119,7 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
         window.removeEventListener("resize", this.onWindowResize);
         window.removeEventListener("orientationchange", this.onWindowResize);
         window.removeEventListener("load", this.onWindowResize);
-        this.cleanup.map(c => c());
+        this.cleanup.map((c) => c());
         this.active = false;
     }
 
@@ -126,9 +127,9 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
         try {
             const expr = mathParse(this.state.expr);
 
-            const variable = Array.from(new Set(expr.filter((n, path) =>
-                n.isSymbolNode && path !== "fn",
-            ).map(n => n.name!)))[0];
+            const variable = Array.from(
+                new Set(expr.filter((n, path) => n.isSymbolNode && path !== "fn").map((n) => n.name!))
+            )[0];
 
             const texExpr = expr.toTex();
             const dTexExpr = derivative(expr, variable).toTex();
@@ -146,14 +147,14 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
                 this.gpu!.nativeFunctions = [];
             }
 
-            this.kernel = newtonKernel(this.gpu!, this.state.expr,
-                [this.state.width, this.state.height]
-            );
+            this.kernel = newtonKernel(this.gpu!, this.state.expr, [this.state.width, this.state.height]);
             // @ts-ignore
             this.kernel(
                 this.state.height,
-                this.state.offsetX, this.state.offsetY,
-                this.state.scaleX, this.state.scaleY,
+                this.state.offsetX,
+                this.state.offsetY,
+                this.state.scaleX,
+                this.state.scaleY,
                 this.state.maxIterations,
                 this.state.method,
                 parseFloat(this.state.a[0]),
@@ -170,28 +171,34 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
     }
 
     render() {
-
         return (
             <React.Fragment>
                 <NewtonMenu
                     width={this.state.width}
                     isOpen={this.state.isDrawerOpen}
-                    onMenuStateChange={state => this.setState({ isDrawerOpen: state.isOpen })}
+                    onMenuStateChange={(state) => this.setState({ isDrawerOpen: state.isOpen })}
                     // tslint:disable-next-line: max-line-length
-                    onMaxIterationsChange={e => this.setState({ maxIterations: parseInt(e.currentTarget.value) }, () => this.invalidated = true)}
+                    onMaxIterationsChange={(e) =>
+                        this.setState(
+                            { maxIterations: parseInt(e.currentTarget.value) },
+                            () => (this.invalidated = true)
+                        )
+                    }
                     maxIterations={this.state.maxIterations}
                     method={this.state.method}
-                    onMethodChange={newMethod => this.setState({ method: parseInt(newMethod) }, () => this.invalidated = true)}
+                    onMethodChange={(newMethod) =>
+                        this.setState({ method: parseInt(newMethod) }, () => (this.invalidated = true))
+                    }
                     a={this.state.a}
-                    onaChange={newA => this.setState({ a: newA }, () => this.invalidated = true)}
+                    onaChange={(newA) => this.setState({ a: newA }, () => (this.invalidated = true))}
                     c={this.state.c}
-                    oncChange={newC => this.setState({ c: newC }, () => this.invalidated = true)}
+                    oncChange={(newC) => this.setState({ c: newC }, () => (this.invalidated = true))}
                 />
                 <div id="canvas-div" />
                 <NewtonModal
                     showModal={this.state.showModal}
                     expression={this.state.expr}
-                    onExpressionChanged={e => this.setState({ expr: e }, this.compile)}
+                    onExpressionChanged={(e) => this.setState({ expr: e }, this.compile)}
                     texExpression={this.state.texExpr}
                     differentiatedTexExpression={this.state.dTexExpr}
                     errorText={this.state.errorText}

@@ -14,7 +14,11 @@ interface MandelbrotState extends CameraState {
 export class MandelbrotContainer extends React.Component<{}, MandelbrotState, any> {
     canvas?: HTMLCanvasElement;
 
-    colorSchemes: [number, string][] = [[0, "Green"], [1, "Wikipedia"], [2, "Greyscale"]];
+    colorSchemes: [number, string][] = [
+        [0, "Green"],
+        [1, "Wikipedia"],
+        [2, "Greyscale"],
+    ];
     active = true;
     invalidated = true;
     gpu?: GPU;
@@ -32,24 +36,27 @@ export class MandelbrotContainer extends React.Component<{}, MandelbrotState, an
             isDrawerOpen: false,
             colorScheme: 0,
             maxIterations: 700,
-            offsetX: 1.2 * initialScale * -window.innerWidth / 2,
-            offsetY: initialScale * window.innerHeight / 2,
+            offsetX: (1.2 * initialScale * -window.innerWidth) / 2,
+            offsetY: (initialScale * window.innerHeight) / 2,
             scaleX: initialScale,
             scaleY: initialScale,
         };
     }
 
     onWindowResize() {
-        this.setState({
-            height: window.innerHeight,
-            width: window.innerWidth,
-        }, () => {
-            this.invalidated = true;
+        this.setState(
+            {
+                height: window.innerHeight,
+                width: window.innerWidth,
+            },
+            () => {
+                this.invalidated = true;
 
-            this.kernel!.setOutput([this.state.width, this.state.height]);
-            this.canvas!.width = this.state.width;
-            this.canvas!.height = this.state.height;
-        });
+                this.kernel!.setOutput([this.state.width, this.state.height]);
+                this.canvas!.width = this.state.width;
+                this.canvas!.height = this.state.height;
+            }
+        );
     }
 
     componentDidMount() {
@@ -57,28 +64,27 @@ export class MandelbrotContainer extends React.Component<{}, MandelbrotState, an
         window.addEventListener("orientationchange", this.onWindowResize.bind(this, false));
         window.addEventListener("load", this.onWindowResize.bind(this, false));
 
-        this.canvas = document.getElementById("canvas-div")!
-            .appendChild(
-                document.createElement("canvas"),
-            );
+        this.canvas = document.getElementById("canvas-div")!.appendChild(document.createElement("canvas"));
 
         //this.cleanup.push(
-        panzoomWrapper(this, this.canvas, () => this.invalidated = true);
+        panzoomWrapper(this, this.canvas, () => (this.invalidated = true));
         //);
 
         this.gpu = new GPU({
             canvas: this.canvas,
             mode: "webgl",
         });
-        this.kernel = createMandelbrotKernel(this.gpu,
-            [this.state.width, this.state.height]
-        );
-        this.kernel.build.apply(this.kernel,
-            [this.state.width, this.state.height,
-            this.state.offsetX, this.state.offsetY,
-            this.state.scaleX, this.state.scaleY,
-            this.state.maxIterations, this.state.colorScheme]
-        );
+        this.kernel = createMandelbrotKernel(this.gpu, [this.state.width, this.state.height]);
+        this.kernel.build.apply(this.kernel, [
+            this.state.width,
+            this.state.height,
+            this.state.offsetX,
+            this.state.offsetY,
+            this.state.scaleX,
+            this.state.scaleY,
+            this.state.maxIterations,
+            this.state.colorScheme,
+        ]);
 
         // @ts-ignore
         this.cleanup.push(() => this.kernel.destroy());
@@ -91,10 +97,14 @@ export class MandelbrotContainer extends React.Component<{}, MandelbrotState, an
         if (this.active && this.canvas) {
             if (this.invalidated) {
                 this.kernel!.run(
-                    this.state.width, this.state.height,
-                    this.state.offsetX, this.state.offsetY,
-                    this.state.scaleX, this.state.scaleY,
-                    this.state.maxIterations, this.state.colorScheme
+                    this.state.width,
+                    this.state.height,
+                    this.state.offsetX,
+                    this.state.offsetY,
+                    this.state.scaleX,
+                    this.state.scaleY,
+                    this.state.maxIterations,
+                    this.state.colorScheme
                 );
                 this.invalidated = false;
             }
@@ -106,15 +116,18 @@ export class MandelbrotContainer extends React.Component<{}, MandelbrotState, an
         window.removeEventListener("resize", this.onWindowResize);
         window.removeEventListener("orientationchange", this.onWindowResize);
         window.removeEventListener("load", this.onWindowResize);
-        this.cleanup.map(c => c());
+        this.cleanup.map((c) => c());
         this.active = false;
     }
 
     updateUniforms(colorScheme: number, maxIterations: number) {
-        this.setState({
-            colorScheme,
-            maxIterations,
-        }, () => this.invalidated = true);
+        this.setState(
+            {
+                colorScheme,
+                maxIterations,
+            },
+            () => (this.invalidated = true)
+        );
     }
 
     render() {
@@ -126,8 +139,8 @@ export class MandelbrotContainer extends React.Component<{}, MandelbrotState, an
                     value={v}
                     checked={this.state.colorScheme === v}
                     onChange={() => this.updateUniforms(v, this.state.maxIterations)}
-                />
-                {" "}{n}
+                />{" "}
+                {n}
             </label>
         ));
         return (
@@ -135,7 +148,9 @@ export class MandelbrotContainer extends React.Component<{}, MandelbrotState, an
                 <Menu
                     width={this.state.width >= 400 ? "400px" : "85%"}
                     isOpen={this.state.isDrawerOpen}
-                    onStateChange={state => { this.setState({ isDrawerOpen: state.isOpen }); }}
+                    onStateChange={(state) => {
+                        this.setState({ isDrawerOpen: state.isOpen });
+                    }}
                 >
                     <h1>Mandelbrot</h1>
                     <div>
@@ -146,7 +161,9 @@ export class MandelbrotContainer extends React.Component<{}, MandelbrotState, an
                             min="1"
                             max="3000"
                             value={this.state.maxIterations}
-                            onChange={e => this.updateUniforms(this.state.colorScheme, parseInt(e.currentTarget.value))}
+                            onChange={(e) =>
+                                this.updateUniforms(this.state.colorScheme, parseInt(e.currentTarget.value))
+                            }
                         />
                     </div>
                     <div>

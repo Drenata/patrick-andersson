@@ -17,27 +17,21 @@ export interface CameraState {
 export function panzoomWrapper<U extends CameraState>(
     component: React.Component<any, U>,
     canvas: HTMLCanvasElement,
-    afterUpdate: () => any,
+    afterUpdate: () => any
 ): () => void {
-
     // @ts-ignore
     return panzoom(canvas, (e: any) => {
-
         const clamp = (x: number, min: number, max: number) => {
-            return x < min
-                ? min
-                : x > max
-                    ? max
-                    : x;
+            return x < min ? min : x > max ? max : x;
         };
 
-        component.setState(oldState => {
+        component.setState((oldState) => {
             const left = 0;
             const top = 0;
             const width = oldState.width;
             const height = oldState.height;
 
-            const zoom = clamp(-e.dz, -height * .75, height * .75) / height;
+            const zoom = clamp(-e.dz, -height * 0.75, height * 0.75) / height;
 
             const x = { offset: oldState.offsetX, scale: oldState.scaleX };
             const y = { offset: oldState.offsetY, scale: oldState.scaleY };
@@ -47,7 +41,7 @@ export function panzoomWrapper<U extends CameraState>(
 
             const tx = (e.x - left) / width - oX;
             const prevScale = x.scale;
-            x.scale *= (1 - zoom);
+            x.scale *= 1 - zoom;
             x.scale = clamp(x.scale, 0.000000000000001, 100000000000000);
             x.offset -= width * (x.scale - prevScale) * tx;
 
@@ -55,18 +49,16 @@ export function panzoomWrapper<U extends CameraState>(
             y.offset += y.scale * e.dy;
             const ty = oY - (e.y - top) / height;
             const prevScale$1 = y.scale;
-            y.scale *= (1 - zoom);
+            y.scale *= 1 - zoom;
             y.scale = clamp(y.scale, 0.000000000000001, 100000000000000);
             y.offset -= height * (y.scale - prevScale$1) * ty;
 
-            return ({
+            return {
                 offsetX: x.offset,
                 offsetY: y.offset,
                 scaleX: x.scale,
                 scaleY: y.scale,
-            });
+            };
         }, afterUpdate);
-
     });
-
 }

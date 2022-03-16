@@ -18,7 +18,7 @@ export class ThirdPolynomialBars implements Background {
     setNumBoxes = (event: React.FormEvent<HTMLInputElement>) => {
         const value = parseInt(event.currentTarget.value);
         this.numberOfBoxes = value;
-    }
+    };
 
     optionControls = () => {
         return (
@@ -35,7 +35,7 @@ export class ThirdPolynomialBars implements Background {
                 </div>
             </div>
         );
-    }
+    };
 
     draw(t: number, context: CanvasRenderingContext2D, width: number, height: number) {
         context.clearRect(0, 0, width, height);
@@ -44,10 +44,10 @@ export class ThirdPolynomialBars implements Background {
         const boxheight = boxWidth * 4;
 
         for (let i = 0; i < this.numberOfBoxes; i++) {
-            let y = Interval.sample(t, -5, 5, 10 * i / this.numberOfBoxes);
-            y = Math.pow(y, 3) * -((boxheight / 2) - (height / 2)) / 50;
+            let y = Interval.sample(t, -5, 5, (10 * i) / this.numberOfBoxes);
+            y = (Math.pow(y, 3) * -(boxheight / 2 - height / 2)) / 50;
             context.fillStyle = Color.linearInterpolate(this.color1, this.color2, i / this.numberOfBoxes).toString();
-            context.fillRect(i * width / this.numberOfBoxes, y + (height / 2) - boxheight / 2, boxWidth, boxheight);
+            context.fillRect((i * width) / this.numberOfBoxes, y + height / 2 - boxheight / 2, boxWidth, boxheight);
         }
     }
 }

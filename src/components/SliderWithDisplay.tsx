@@ -2,7 +2,6 @@ import * as React from "react";
 import { Slider } from "./Slider";
 
 export class SliderWithDisplay extends Slider {
-
     private style = {
         display: "inline-block",
         paddingLeft: "1em",
@@ -14,10 +13,7 @@ export class SliderWithDisplay extends Slider {
         return (
             <React.Fragment>
                 {super.render()}
-                <div
-                    style={this.style}
-                >{this.state.value}
-                </div>
+                <div style={this.style}>{this.state.value}</div>
             </React.Fragment>
         );
     }

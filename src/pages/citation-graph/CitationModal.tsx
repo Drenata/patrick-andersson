@@ -12,26 +12,25 @@ export function CitationModal(props: {
     return (
         <Modal show={props.showModal}>
             <h1>Citation graph</h1>
-            <p>Displays the connections between articles as a graph.
-                Mouseover to highlight connections. Click on an article to expand the graph.
-                See the sidebar for more options after selecting an article.
+            <p>
+                Displays the connections between articles as a graph. Mouseover to highlight connections. Click on an
+                article to expand the graph. See the sidebar for more options after selecting an article.
             </p>
             <p>To specify an article, enter an identifier in the box below. An idenfitier can be a</p>
             <ul>
-                <li>Semantic sholar id, e.g. 
+                <li>
+                    Semantic sholar id, e.g. 
                     <a onClick={() => props.selectArticle("56aec6894f829ca642fd0f045c5ee9ef278c546d")}>
                         56aec6894f829ca642fd0f045c5ee9ef278c546d
                     </a>
                 </li>
-                <li>Digital Object Identifier (DOI), e.g. 
-                    <a onClick={() => props.selectArticle("10.1145/2461912.2462024")}>
-                        10.1145/2461912.2462024
-                    </a>
+                <li>
+                    Digital Object Identifier (DOI), e.g. 
+                    <a onClick={() => props.selectArticle("10.1145/2461912.2462024")}>10.1145/2461912.2462024</a>
                 </li>
-                <li>ArXiv Identifier, e.g. 
-                    <a onClick={() => props.selectArticle("arXiv:1803.03453")}>
-                        arXiv:1803.03453
-                    </a>
+                <li>
+                    ArXiv Identifier, e.g. 
+                    <a onClick={() => props.selectArticle("arXiv:1803.03453")}>arXiv:1803.03453</a>
                 </li>
             </ul>
             <h2>Options</h2>
@@ -46,18 +45,19 @@ export function CitationModal(props: {
                     &nbsp;&nbsp;Load edges between ALL nodes (instead of only expanded nodes)
                 </label>
             </p>
-            <div style={{ display: 'flex', justifyContent: "center" }}>
+            <div style={{ display: "flex", justifyContent: "center" }}>
                 <input
                     className="text-input"
                     placeholder="Identifier"
-                    onChange={e => props.onQueryInput(e.currentTarget.value)}
+                    onChange={(e) => props.onQueryInput(e.currentTarget.value)}
                     value={props.query}
-                    onKeyPress={event => { if (event.key === "Enter") { props.selectArticle(props.query); } }}
+                    onKeyPress={(event) => {
+                        if (event.key === "Enter") {
+                            props.selectArticle(props.query);
+                        }
+                    }}
                 />
-                <a
-                    className="a-text-btn"
-                    onClick={() => props.selectArticle(props.query)}
-                >
+                <a className="a-text-btn" onClick={() => props.selectArticle(props.query)}>
                     Select
                 </a>
             </div>

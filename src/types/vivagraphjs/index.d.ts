@@ -1,4 +1,4 @@
-declare module 'vivagraphjs' {
+declare module "vivagraphjs" {
     namespace Graph {
         const BrowserInfo: {
             browser: string;
@@ -69,4 +69,4 @@ declare module 'vivagraphjs' {
     export function lazyExtend(...args: any[]): any;
     export function random(...args: any[]): any;
     export function randomIterator(...args: any[]): any;
-};
+}

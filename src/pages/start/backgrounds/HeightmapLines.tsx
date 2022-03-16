@@ -29,27 +29,27 @@ export class HeightmapLines implements Background {
     setNumLines = (event: React.FormEvent<HTMLInputElement>) => {
         const value = parseInt(event.currentTarget.value);
         this.numLines = value;
-    }
+    };
 
     setScaleZ = (event: React.FormEvent<HTMLInputElement>) => {
         const value = parseFloat(event.currentTarget.value);
         this.scaleZ = value;
-    }
+    };
 
     setDissonance = (event: React.FormEvent<HTMLInputElement>) => {
         const value = parseFloat(event.currentTarget.value);
         this.dissonance = value;
-    }
+    };
 
     setSpeed = (event: React.FormEvent<HTMLInputElement>) => {
         const value = parseFloat(event.currentTarget.value);
         this.speed = value;
-    }
+    };
 
     setPointSeparation = (event: React.FormEvent<HTMLInputElement>) => {
         const value = parseFloat(event.currentTarget.value);
         this.pointSeparation = value;
-    }
+    };
 
     optionControls = () => (
         <div className="slidercontainer" key="rain">
@@ -104,7 +104,7 @@ export class HeightmapLines implements Background {
                 />
             </div>
         </div>
-    )
+    );
 
     draw(t: number, context: CanvasRenderingContext2D, width: number, height: number) {
         context.clearRect(0, 0, width, height);
@@ -118,14 +118,19 @@ export class HeightmapLines implements Background {
             context.beginPath();
             const lineY = (line - 10) * lineSpacing;
             let from = [0, lineY];
-            context.strokeStyle = Color
-                .linearInterpolate(this.beginningColor, this.endColor, line / this.numLines)
-                .toString();
+            context.strokeStyle = Color.linearInterpolate(
+                this.beginningColor,
+                this.endColor,
+                line / this.numLines
+            ).toString();
             context.moveTo(from[0], from[1]);
 
             for (let x = this.pointSeparation; x <= width + this.pointSeparation * 2; x += this.pointSeparation) {
                 const fallof = fallofFuncX(x) * fallofFuncY(lineY);
-                const to = [x, lineY + this.scaleZ * fallof * this.simplex.noise2D(x, lineY * this.dissonance + offset)];
+                const to = [
+                    x,
+                    lineY + this.scaleZ * fallof * this.simplex.noise2D(x, lineY * this.dissonance + offset),
+                ];
                 const cp = [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2];
                 context.quadraticCurveTo(from[0], from[1], cp[0], cp[1]);
                 from = to;

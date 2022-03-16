@@ -2,7 +2,6 @@
  * Maps a continously growing value onto a fixed interval
  */
 export class Interval {
-
     static sample(t: number, a: number, b: number, displacement: number): number {
         return ((t + displacement) % (b - a)) + a;
     }
@@ -26,7 +25,6 @@ export class Interval {
     sample(t: number): number {
         return ((t + this.displacement) % this.intervalLength) + this.a;
     }
-
 }
 
 /**
@@ -57,9 +55,7 @@ export function rangeToRange(a: number, b: number, c: number, d: number) {
  * @param w max amount of characters
  */
 export function chunk(s: string, w: number) {
-    return s.replace(
-        new RegExp(`(?![^\\n]{1,${w}}$)([^\\n]{1,${w}})\\s`, "g"), "$1\n",
-    ).split("\n");
+    return s.replace(new RegExp(`(?![^\\n]{1,${w}}$)([^\\n]{1,${w}})\\s`, "g"), "$1\n").split("\n");
 }
 
 /**
@@ -71,15 +67,17 @@ export function chunk(s: string, w: number) {
 export function saveSVG(svg: HTMLElement) {
     let source = svg.outerHTML;
     // add name spaces.
-    if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) { // eslint-disable-line
-        source = source.replace(/^<svg/, "<svg xmlns=\"http://www.w3.org/2000/svg\"");
+    if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+        // eslint-disable-line
+        source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
     }
-    if (!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)) { // eslint-disable-line
-        source = source.replace(/^<svg/, "<svg xmlns:xlink=\"http://www.w3.org/1999/xlink\"");
+    if (!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)) {
+        // eslint-disable-line
+        source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
     }
 
     // add xml declaration
-    source = "<?xml version=\"1.0\" standalone=\"yes\"?>\r\n" + source;
+    source = '<?xml version="1.0" standalone="yes"?>\r\n' + source;
     const svgBlob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
     const svgUrl = URL.createObjectURL(svgBlob);
     const downloadLink = document.createElement("a");
@@ -94,5 +92,5 @@ export const removeWhitespaceAndFilter = (str: string, allowed: string[]) =>
     str
         .replace(/\s/g, "")
         .split("")
-        .filter(char => allowed.join().indexOf(char) !== -1)
+        .filter((char) => allowed.join().indexOf(char) !== -1)
         .join("");

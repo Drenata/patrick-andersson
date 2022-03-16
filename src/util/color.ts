@@ -1,13 +1,12 @@
 import { linearInterpolate } from "./util";
 
 export class Color {
-
     static linearInterpolate(fromColor: Color, toColor: Color, x: number) {
         return new Color(
             Math.floor(linearInterpolate(fromColor.r, toColor.r, x)),
             Math.floor(linearInterpolate(fromColor.g, toColor.g, x)),
             Math.floor(linearInterpolate(fromColor.b, toColor.b, x)),
-            linearInterpolate(fromColor.a, toColor.a, x),
+            linearInterpolate(fromColor.a, toColor.a, x)
         );
     }
 
@@ -22,12 +21,10 @@ export class Color {
 
     static hexToRgb(hex: string): [number, number, number] {
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        if (!result) { throw new Error("Invalid hex " + hex); }
-        return [
-            parseInt(result[1], 16),
-            parseInt(result[2], 16),
-            parseInt(result[3], 16),
-        ];
+        if (!result) {
+            throw new Error("Invalid hex " + hex);
+        }
+        return [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)];
     }
 
     r: number;
@@ -45,5 +42,4 @@ export class Color {
     toString(): string {
         return `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a})`;
     }
-
 }

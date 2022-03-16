@@ -3,17 +3,7 @@ import TeX from "@matejmazur/react-katex";
 import * as React from "react";
 
 export const TexList = (props: { maths: string[] }) => {
-    const rootsList = props.maths.map(math => (
-        <TeX
-            key={math}
-            math={math}
-            block={true}
-        />
-    ));
+    const rootsList = props.maths.map((math) => <TeX key={math} math={math} block={true} />);
 
-    return (
-        <React.Fragment>
-            {rootsList}
-        </React.Fragment>
-    );
+    return <React.Fragment>{rootsList}</React.Fragment>;
 };

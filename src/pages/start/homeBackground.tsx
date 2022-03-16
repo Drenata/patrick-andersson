@@ -58,9 +58,9 @@ export class HomeBackground extends React.Component<{}, HomeBackgroundState> {
                 this.accum,
                 canvas.getContext("2d")!,
                 this.canvas.current!.width,
-                this.canvas.current!.height,
+                this.canvas.current!.height
             );
-            requestAnimationFrame(t => this.update(t));
+            requestAnimationFrame((t) => this.update(t));
         }
     }
 
@@ -69,22 +69,27 @@ export class HomeBackground extends React.Component<{}, HomeBackgroundState> {
     }
 
     prev() {
-        this.switchBackground(
-            this.state.backgroundIndex == 0
-                ? this.numBGs - 1
-                : this.state.backgroundIndex - 1,
-        );
+        this.switchBackground(this.state.backgroundIndex == 0 ? this.numBGs - 1 : this.state.backgroundIndex - 1);
     }
 
     switchBackground(newBackgroundIndex: number) {
         this.canvas.current!.getContext("2d")!.setTransform(1, 0, 0, 1, 0, 0);
         let newBackground: Background;
         switch (newBackgroundIndex) {
-            case 0: newBackground = new ThirdPolynomialBars(40); break;
-            case 1: newBackground = new HeightmapLines(); break;
-            case 2: newBackground = new Sphere(); break;
-            case 3: newBackground = new Rain(); break;
-            default: newBackground = new ThirdPolynomialBars(40);
+            case 0:
+                newBackground = new ThirdPolynomialBars(40);
+                break;
+            case 1:
+                newBackground = new HeightmapLines();
+                break;
+            case 2:
+                newBackground = new Sphere();
+                break;
+            case 3:
+                newBackground = new Rain();
+                break;
+            default:
+                newBackground = new ThirdPolynomialBars(40);
         }
         this.setState({
             background: newBackground,
@@ -96,7 +101,7 @@ export class HomeBackground extends React.Component<{}, HomeBackgroundState> {
         window.addEventListener("resize", this.onReszize.bind(this, false));
         window.addEventListener("load", this.onReszize.bind(this, false));
         this.switchBackground(Math.floor(Math.random() * this.numBGs));
-        requestAnimationFrame(t => this.update(t));
+        requestAnimationFrame((t) => this.update(t));
     }
 
     componentWillUnmount() {
@@ -105,34 +110,39 @@ export class HomeBackground extends React.Component<{}, HomeBackgroundState> {
     }
 
     render() {
-        const optionControls = this.state.background && this.state.drawOptions
-            ? (
+        const optionControls =
+            this.state.background && this.state.drawOptions ? (
                 <div className="bg-controller">
                     <this.state.background.optionControls />
                 </div>
-            )
-            : undefined;
+            ) : undefined;
         return (
             <React.Fragment>
                 <div className="content">
-                    <div className="z-one"><a href="https://github.com/Drenata">Github</a></div>
-                    <div className="z-one"><a href="https://www.linkedin.com/in/patrick-andersson-8755bab4/">LinkedIn</a></div>
+                    <div className="z-one">
+                        <a href="https://github.com/Drenata">Github</a>
+                    </div>
+                    <div className="z-one">
+                        <a href="https://www.linkedin.com/in/patrick-andersson-8755bab4/">LinkedIn</a>
+                    </div>
                 </div>
                 <div id="canvas-div">
-                    <canvas
-                        ref={this.canvas}
-                        width={this.state.width}
-                        height={this.state.height}
-                    /></div>
+                    <canvas ref={this.canvas} width={this.state.width} height={this.state.height} />
+                </div>
                 <div id="controls-container">
                     <PreviousButton onClick={this.prev} />
                     <NextButton onClick={this.next} />
-                    <ConfigButton onClick={() => this.setState({ drawOptions: !this.state.drawOptions })} />
+                    <ConfigButton
+                        onClick={() =>
+                            this.setState({
+                                drawOptions: !this.state.drawOptions,
+                            })
+                        }
+                    />
                     <FullscreenButton />
                 </div>
                 {optionControls}
             </React.Fragment>
         );
     }
-
 }

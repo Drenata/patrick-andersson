@@ -1,6 +1,8 @@
 import * as React from "react";
 
-export interface ModalProps { show: boolean }
+export interface ModalProps {
+    show: boolean;
+}
 
 export class Modal extends React.Component<ModalProps> {
     render() {
@@ -10,11 +12,8 @@ export class Modal extends React.Component<ModalProps> {
 
         return (
             <div className="modal-backdrop">
-                <div className="modal-background">
-                    {this.props.children}
-                </div>
+                <div className="modal-background">{this.props.children}</div>
             </div>
         );
     }
-
 }

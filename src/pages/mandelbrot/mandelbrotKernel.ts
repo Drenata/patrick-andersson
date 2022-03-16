@@ -9,9 +9,8 @@ function manbelbrotKernelCode(
     scaleX: number,
     scaleY: number,
     maxIterations: number,
-    colorScheme: number,
+    colorScheme: number
 ) {
-
     let x0 = this.thread.x;
     let y0 = this.thread.y! - wh;
     x0 *= scaleX;
@@ -42,8 +41,9 @@ function manbelbrotKernelCode(
         } else {
             this.color(0.1, q, 0.1);
         }
-    } else if (colorScheme == 1) {
+    } else if (colorScheme === 1) {
         const i = iteration - 16 * Math.floor(iteration / 16);
+        // prettier-ignore
         if (q >= 0.99) { this.color(0, 0, 0); } else
         if (i < 1.0) { this.color(66 / 255, 30 / 255, 15 / 255); } else
         if (i < 2.0) { this.color(25 / 255, 7 / 255, 26 / 255); } else
@@ -68,11 +68,9 @@ function manbelbrotKernelCode(
 }
 
 export function createMandelbrotKernel(gpu: GPU, resolution: [number, number]) {
-    return gpu.createKernel(
-        manbelbrotKernelCode, {
-            graphical: true,
-            dynamicOutput: true,
-            output: resolution
-        });
-
+    return gpu.createKernel(manbelbrotKernelCode, {
+        graphical: true,
+        dynamicOutput: true,
+        output: resolution,
+    });
 }

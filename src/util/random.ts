@@ -18,7 +18,7 @@ export class Random {
      * Returns a pseudo-random value between 1 and 2^32 - 2.
      */
     next(): number {
-        return this.seed = this.seed * 16807 % 2147483647;
+        return (this.seed = (this.seed * 16807) % 2147483647);
     }
     /**
      * Returns a pseudo-random floating point number in range [0, 1).

@@ -16,29 +16,16 @@ export interface Article {
     references: Article[];
 }
 
-export function highlightRelatedNodes(
-    graph: any, graphics: any,
-    nodeID: string, isOn: boolean) {
+export function highlightRelatedNodes(graph: any, graphics: any, nodeID: string, isOn: boolean) {
     graph.forEachLinkedNode(nodeID, (node: any, link: any) => {
         const linkUI = graphics.getLinkUI(link.id);
         if (linkUI) {
-            const linkColor = isOn
-                ? link.fromId === nodeID
-                    ? "red"
-                    : "green"
-                : "gray";
-            const nodeColor = isOn
-                ? link.fromId === nodeID
-                    ? "red"
-                    : "green"
-                : "white";
+            const linkColor = isOn ? (link.fromId === nodeID ? "red" : "green") : "gray";
+            const nodeColor = isOn ? (link.fromId === nodeID ? "red" : "green") : "white";
 
             // linkUI is a UI object created by graphics below
             linkUI.attr("stroke", linkColor);
-            graphics
-                .getNodeUI(node.id)
-                .childNodes
-                .forEach((c: HTMLElement) => c.setAttribute("fill", nodeColor));
+            graphics.getNodeUI(node.id).childNodes.forEach((c: HTMLElement) => c.setAttribute("fill", nodeColor));
         }
     });
 }
@@ -56,7 +43,7 @@ export function getNodeSVG(title: string): SVGElement {
             .attr("style", "font-size: 0.8em;")
             .attr("fill", "white")
             // Magic constanst to center text vertically
-            .attr("y", -15 * (titleParts.length - 1) / 2 + 15 * i);
+            .attr("y", (-15 * (titleParts.length - 1)) / 2 + 15 * i);
         container.append(e);
     });
 
@@ -64,9 +51,7 @@ export function getNodeSVG(title: string): SVGElement {
 }
 
 export function citationGraphLink(link: any) {
-    return Viva.Graph.svg("path")
-        .attr("stroke", "gray")
-        .attr("marker-mid", "url(#Triangle)");
+    return Viva.Graph.svg("path").attr("stroke", "gray").attr("marker-mid", "url(#Triangle)");
 }
 
 export function createMarker(id: string) {
@@ -82,10 +67,7 @@ export function createMarker(id: string) {
 }
 
 export function triangleSVG() {
-    return Viva.Graph.svg("path")
-        .attr("d", "M 0 0 L 10 5 L 0 10 z")
-        .attr("stroke", "gray")
-        .attr("fill", "gray");
+    return Viva.Graph.svg("path").attr("d", "M 0 0 L 10 5 L 0 10 z").attr("stroke", "gray").attr("fill", "gray");
 }
 
 export async function getArticle(id: string): Promise<Article> {
