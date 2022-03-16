@@ -33,7 +33,7 @@ function manbelbrotKernelCode(
     }
 
     const q = iteration / maxIterations;
-    if (colorScheme == 0) {
+    if (colorScheme === 0) {
         if (q >= 1) {
             this.color(0, 0, 0);
         } else if (q > 0.5) {

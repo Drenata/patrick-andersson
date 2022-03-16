@@ -69,7 +69,7 @@ export class HomeBackground extends React.Component<{}, HomeBackgroundState> {
     }
 
     prev() {
-        this.switchBackground(this.state.backgroundIndex == 0 ? this.numBGs - 1 : this.state.backgroundIndex - 1);
+        this.switchBackground(this.state.backgroundIndex === 0 ? this.numBGs - 1 : this.state.backgroundIndex - 1);
     }
 
     switchBackground(newBackgroundIndex: number) {
