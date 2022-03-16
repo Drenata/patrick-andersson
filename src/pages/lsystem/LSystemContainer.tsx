@@ -1,11 +1,11 @@
 import * as React from "react";
-import { Line, PerspectiveCamera, Scene, WebGLRenderer } from "three";
+import { Line, Material, PerspectiveCamera, Scene, WebGLRenderer } from "three";
 import { ConfigButton, FullscreenButton, NextButton, ResetButton } from "../../components/buttons";
 import { removeWhitespaceAndFilter } from "../../util/util";
 import { LSystem, ProductionRules } from "./LSystem";
 import { examples } from "./LSystemExamples";
 import { LSystemModal } from "./LSystemModal";
-import { TurtleCommands, TurtleCommandTypes } from "./turtle";
+import { TurtleCommandMap, TurtleCommandTypes } from "./turtle";
 
 interface LSystemState {
     height: number;
@@ -14,7 +14,7 @@ interface LSystemState {
     alphabet: string[];
     productionRules: ProductionRules;
     axiom: string;
-    visualization: TurtleCommands;
+    visualization: TurtleCommandMap;
 }
 
 export class LSystemContainer extends React.Component<{}, LSystemState> {
@@ -24,7 +24,7 @@ export class LSystemContainer extends React.Component<{}, LSystemState> {
     canvas?: HTMLCanvasElement;
     panZoom: any;
     level: number;
-    line?: Line;
+    lines?: Line[];
     lSystem?: LSystem;
     active = true;
 
@@ -68,10 +68,12 @@ export class LSystemContainer extends React.Component<{}, LSystemState> {
         }
 
         const defaultVisualization = [{ command: TurtleCommandTypes.MOVE, argument: "0" }];
-        const visualization: TurtleCommands = {};
+        const visualization: TurtleCommandMap = {};
         for (const key of alphabet) {
-            visualization[key] = (oldState.visualization[key] || defaultVisualization)
-                .map(cmd => ({ command: cmd.command, argument: cmd.argument }));
+            visualization[key] = (oldState.visualization[key] || defaultVisualization).map((cmd) => ({
+                command: cmd.command,
+                argument: cmd.argument,
+            }));
         }
 
         return {
@@ -86,15 +88,17 @@ export class LSystemContainer extends React.Component<{}, LSystemState> {
     }
 
     onWindowResize() {
-        this.setState({
-            height: window.innerHeight,
-            width: window.innerWidth,
-        }, () => {
-            this.camera!.aspect = this.state.width / this.state.height;
-            this.camera!.updateProjectionMatrix();
-            this.renderer!.setSize(this.state.width, this.state.height);
-        });
-
+        this.setState(
+            {
+                height: window.innerHeight,
+                width: window.innerWidth,
+            },
+            () => {
+                this.camera!.aspect = this.state.width / this.state.height;
+                this.camera!.updateProjectionMatrix();
+                this.renderer!.setSize(this.state.width, this.state.height);
+            }
+        );
     }
 
     componentDidMount() {
@@ -106,9 +110,7 @@ export class LSystemContainer extends React.Component<{}, LSystemState> {
 
         this.renderer = new WebGLRenderer();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.canvas = document
-            .getElementById("canvas-div")!
-            .appendChild(this.renderer.domElement);
+        this.canvas = document.getElementById("canvas-div")!.appendChild(this.renderer.domElement);
 
         this.camera.position.z = 5;
         this.update();
@@ -125,23 +127,23 @@ export class LSystemContainer extends React.Component<{}, LSystemState> {
     }
 
     resetLevel() {
-        if (this.line) {
-            this.scene!.remove(this.line);
-            this.line.geometry.dispose();
-            this.line.material.dispose();
+        if (this.lines) {
+            this.scene!.remove(...this.lines);
+            this.lines.map((l) => l.geometry.dispose());
+            this.lines.map((l) => (l.material as Material).dispose());
         }
         this.lSystem!.evolveTo(0);
-        this.line = this.lSystem!.getLine();
-        this.scene!.add(this.line);
+        this.lines = this.lSystem!.getLine();
+        this.lines!.map((l) => this.scene!.add(l));
     }
 
     nextLevel() {
-        this.scene!.remove(this.line!);
-        this.line!.geometry.dispose();
-        this.line!.material.dispose();
+        this.scene!.clear();
+        this.lines!.map((l) => l.geometry.dispose());
+        this.lines!.map((l) => (l.material as Material).dispose());
         this.lSystem!.produce();
-        this.line = this.lSystem!.getLine();
-        this.scene!.add(this.line);
+        this.lines = this.lSystem!.getLine();
+        this.lines!.map((l) => this.scene!.add(l));
     }
 
     componentWillUnmount() {
@@ -157,23 +159,20 @@ export class LSystemContainer extends React.Component<{}, LSystemState> {
         alphabet: string[];
         productionRules: ProductionRules;
         axiom: string;
-        visualization: TurtleCommands;
+        visualization: TurtleCommandMap;
     }) {
         this.setState(example);
     }
 
     loadLSystem = () => {
-        this.lSystem = new LSystem(
-            this.state.productionRules,
-            this.state.axiom,
-            this.state.visualization);
+        this.lSystem = new LSystem(this.state.productionRules, this.state.axiom, this.state.visualization);
         this.resetLevel();
         this.setState({ isConfigOpen: false });
-    }
+    };
 
     onAlphabetChange(e: React.FormEvent<HTMLInputElement>) {
         const v = e.currentTarget.value.match(/\S+/g) || [];
-        this.setState(prevState => this.deepCopyState(prevState, v));
+        this.setState((prevState) => this.deepCopyState(prevState, v));
     }
 
     onAxiomChange(e: React.FormEvent<HTMLInputElement>) {
@@ -182,7 +181,7 @@ export class LSystemContainer extends React.Component<{}, LSystemState> {
     }
 
     onProductionRuleChange(symbol: string, value: string) {
-        this.setState(prevState => {
+        this.setState((prevState) => {
             const newState = this.deepCopyState(prevState);
             newState.productionRules[symbol] = value;
             return newState;
@@ -190,7 +189,7 @@ export class LSystemContainer extends React.Component<{}, LSystemState> {
     }
 
     onRemoveVisualizationRule(symbol: string) {
-        this.setState(prevState => {
+        this.setState((prevState) => {
             const newState = this.deepCopyState(prevState);
             newState.visualization[symbol].pop();
             return newState;
@@ -198,10 +197,10 @@ export class LSystemContainer extends React.Component<{}, LSystemState> {
     }
 
     onAddVisualizationRule(symbol: string) {
-        this.setState(prevState => {
+        this.setState((prevState) => {
             const newState = this.deepCopyState(prevState);
             newState.visualization[symbol].push({
-                argument: "0",
+                argument: 0,
                 command: TurtleCommandTypes.MOVE,
             });
             return newState;
@@ -209,7 +208,7 @@ export class LSystemContainer extends React.Component<{}, LSystemState> {
     }
 
     onVisualizationRuleChange(symbol: string, value: string) {
-        this.setState(prevState => {
+        this.setState((prevState) => {
             const newState = this.deepCopyState(prevState);
             newState.productionRules[symbol] = value;
             return newState;
@@ -217,15 +216,15 @@ export class LSystemContainer extends React.Component<{}, LSystemState> {
     }
 
     onSetArgument(symbol: string, i: number, argument: string) {
-        this.setState(prevState => {
+        this.setState((prevState) => {
             const newState = this.deepCopyState(prevState);
-            newState.visualization[symbol][i].argument = argument;
+            newState.visualization[symbol][i].argument = parseFloat(argument);
             return newState;
         });
     }
 
     onSetCommand(symbol: string, i: number, command: TurtleCommandTypes) {
-        this.setState(prevState => {
+        this.setState((prevState) => {
             const newState = this.deepCopyState(prevState);
             newState.visualization[symbol][i].command = command;
             return newState;
@@ -243,7 +242,7 @@ export class LSystemContainer extends React.Component<{}, LSystemState> {
                     axiom={this.state.axiom}
                     onAxiomChange={this.onAxiomChange}
                     onLoad={this.loadLSystem}
-                    onSelectExample={example => this.selectExample(example)}
+                    onSelectExample={(example) => this.selectExample(example)}
                     productionRules={this.state.productionRules}
                     onProductionRuleChange={this.onProductionRuleChange}
                     visualizations={this.state.visualization}
@@ -256,7 +255,7 @@ export class LSystemContainer extends React.Component<{}, LSystemState> {
                 <div id="controls-container">
                     <NextButton onClick={this.nextLevel} />
                     <ResetButton onClick={this.resetLevel} />
-                    <ConfigButton onClick={() => this.setState({ isConfigOpen: true }) }/>
+                    <ConfigButton onClick={() => this.setState({ isConfigOpen: true })} />
                     <FullscreenButton />
                 </div>
             </React.Fragment>

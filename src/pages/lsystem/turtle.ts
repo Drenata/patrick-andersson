@@ -1,93 +1,112 @@
-import { BufferAttribute, BufferGeometry, LineBasicMaterial, LineSegments, Path } from "three";
+import { BufferAttribute, BufferGeometry, LineBasicMaterial, Line } from "three";
 import { Color } from "../../util/color";
 
 export enum TurtleCommandTypes {
-    MOVE = "Move",
-    ROTATE = "Rotate",
-    PUSH = "Push state",
-    POP = "Pop state",
+    MOVE,
+    ROTATE,
+    PUSH,
+    POP,
 }
 
 export interface TurtleCommand {
     command: TurtleCommandTypes;
-    argument: string;
+    argument: number;
 }
 
-export interface TurtleCommands {
+export interface TurtleCommandMap {
     [symbol: string]: TurtleCommand[];
 }
+export interface CompiledTurtleCommandMap {
+    [symbol: number]: TurtleCommand[];
+}
+
+type TurtlePosition = [number, number, number];
+type TurtleOrientation = number;
+type TurtleState = [TurtlePosition, TurtleOrientation];
 
 export class TurtleGraphics {
-
-    static getLine(input: string, commandMap: TurtleCommands) {
+    static getLine(input: Uint8Array, commandMap: CompiledTurtleCommandMap) {
         const turtle = new TurtleGraphics();
-        for (const symbol of input) {
-            for (const command of commandMap[symbol]) {
-                turtle.act(command);
-            }
+        turtle.act(input, commandMap);
+
+        if (turtle.positions.length) {
+            turtle.lines.push(turtle.positions.slice(0, turtle.l));
         }
 
-        const geometry = new BufferGeometry()
-            .addAttribute("position", new BufferAttribute(new Float32Array(turtle.positions), 3));
+        // TODO you could probably compact the lines if you filtered out on points
+        // on a line to only include corners
+        const geometries = turtle.lines.map((line) =>
+            new BufferGeometry().setAttribute("position", new BufferAttribute(line, 3))
+        );
+
         const material = new LineBasicMaterial({ color: 0xffffff });
-        return new LineSegments(geometry, material);
+        return geometries.map((geometry) => new Line(geometry, material));
     }
 
-    location: [number, number];
-    orientation: number;
+    location: TurtlePosition;
+    orientation: TurtleOrientation;
     color: Color;
     width: number;
-    on: boolean;
-    stateStack: [[number, number], number][];
-    positions: number[];
-    path: Path;
+    stateStack: TurtleState[];
+    lines: Float32Array[];
+    positions: Float32Array;
+    l: number;
 
     constructor() {
-        this.location = [0, 0];
+        this.location = [0, 0, 0];
         this.orientation = 90 * 0.0174532925;
         this.color = new Color(255, 0, 0, 1);
         this.width = 1;
-        this.on = true;
         this.stateStack = [];
-        this.positions = [];
-        this.path = new Path();
+        this.lines = [];
+        this.positions = new Float32Array(2 ** 28);
+        this.l = 0;
+        this.positions[this.l++] = 0;
+        this.positions[this.l++] = 0;
+        this.positions[this.l++] = 0;
     }
 
-    move(distance: number) {
-        this.positions.push(this.location[0], this.location[1], 0);
-        this.location = [
-            this.location[0] + Math.cos(this.orientation) * distance,
-            this.location[1] + Math.sin(this.orientation) * distance,
-        ];
-        this.positions.push(this.location[0], this.location[1], 0);
-    }
+    act(input: Uint8Array, commandMap: CompiledTurtleCommandMap) {
+        for (let i = 0; i < input.length; i++) {
+            const symbol = input[i];
+            for (const command of commandMap[symbol]) {
+                switch (command.command) {
+                    case TurtleCommandTypes.MOVE:
+                        this.location = [
+                            this.location[0] + Math.cos(this.orientation) * command.argument,
+                            this.location[1] + Math.sin(this.orientation) * command.argument,
+                            0,
+                        ];
 
-    rotate(degrees: number) {
-        this.orientation += degrees * 0.0174532925;
-    }
+                        this.positions[this.l++] = this.location[0];
+                        this.positions[this.l++] = this.location[1];
+                        this.positions[this.l++] = this.location[2];
+                        break;
 
-    changeDrawState(enabled: boolean) {
-        this.on = enabled;
-    }
+                    case TurtleCommandTypes.ROTATE:
+                        this.orientation += command.argument * 0.0174532925;
+                        break;
 
-    pushState() {
-        this.stateStack.push([this.location, this.orientation]);
-    }
+                    case TurtleCommandTypes.PUSH:
+                        this.stateStack.push([this.location, this.orientation]);
+                        break;
 
-    popState() {
-        const state = this.stateStack.pop();
-        if (state) {
-            this.location = state[0];
-            this.orientation = state[1];
-        }
-    }
-
-    act(command: TurtleCommand) {
-        switch (command.command) {
-            case TurtleCommandTypes.MOVE: return this.move(parseFloat(command.argument));
-            case TurtleCommandTypes.ROTATE: return this.rotate(parseFloat(command.argument));
-            case TurtleCommandTypes.PUSH: return this.pushState();
-            case TurtleCommandTypes.POP: return this.popState();
+                    case TurtleCommandTypes.POP:
+                        if (this.positions.length) {
+                            this.lines.push(this.positions.slice(0, this.l));
+                            this.l = 0;
+                        }
+                        const state = this.stateStack.pop();
+                        if (state) {
+                            this.location = state[0];
+                            this.orientation = state[1];
+                            this.positions[this.l++] = this.location[0];
+                            this.positions[this.l++] = this.location[1];
+                            this.positions[this.l++] = this.location[2];
+                        }
+                        break;
+                }
+            }
         }
     }
 }

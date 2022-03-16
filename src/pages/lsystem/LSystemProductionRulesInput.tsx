@@ -10,26 +10,23 @@ export const LSystemProductionRulesInput = (props: {
     productionRules: ProductionRules;
     onRuleChange: (symbol: string, value: string) => void;
 }) => {
-
     const onRuleChange = (e: React.FormEvent<HTMLInputElement>, symbol: string) => {
         const value = removeWhitespaceAndFilter(e.currentTarget.value, props.alphabet);
         props.onRuleChange(symbol, value);
     };
 
-    const productionRuleElements = props.alphabet.map(symbol => (
-        <div
-            key={symbol}
-            className="production-rule"
-        >
-            {symbol} → <input
+    const productionRuleElements = props.alphabet.map((symbol) => (
+        <div key={symbol} className="production-rule">
+            {symbol} →{" "}
+            <input
                 key={symbol + "-product"}
                 type="text"
                 name={symbol + "-product"}
                 className="text-input"
                 value={props.productionRules[symbol]}
-                onChange={e => onRuleChange(e, symbol)}
+                onChange={(e) => onRuleChange(e, symbol)}
             />
         </div>
     ));
-    return (<div id="production-rules">{productionRuleElements}</div>);
+    return <div id="production-rules">{productionRuleElements}</div>;
 };
