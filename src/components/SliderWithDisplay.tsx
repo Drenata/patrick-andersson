@@ -1,20 +1,27 @@
 import * as React from "react";
-import { Slider } from "./Slider";
+import { Slider, SliderProps } from "./Slider";
 
-export class SliderWithDisplay extends Slider {
-    private style = {
-        display: "inline-block",
-        paddingLeft: "1em",
-        verticalAlign: "super",
-        width: "20%",
-    };
-
-    render() {
-        return (
-            <React.Fragment>
-                {super.render()}
-                <div style={this.style}>{this.state.value}</div>
-            </React.Fragment>
-        );
-    }
+export function SliderWithDisplay(sliderProps: SliderProps) {
+    const [value, setValue] = React.useState(sliderProps.initialValue);
+    return (
+        <>
+            <Slider
+                {...sliderProps}
+                onInput={(x) => {
+                    sliderProps.onInput(x);
+                    setValue(parseFloat(x.currentTarget.value));
+                }}
+            ></Slider>
+            <div
+                style={{
+                    display: "inline-block",
+                    paddingLeft: "1em",
+                    verticalAlign: "super",
+                    width: "20%",
+                }}
+            >
+                {value}
+            </div>
+        </>
+    );
 }

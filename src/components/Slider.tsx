@@ -13,35 +13,25 @@ export interface SliderState {
     value: number;
 }
 
-export class Slider extends React.Component<SliderProps, SliderState> {
-    constructor(props: SliderProps) {
-        super(props);
+export function Slider({ id, min, max, step, initialValue, onInput }: SliderProps) {
+    const [value, setValue] = React.useState(initialValue);
 
-        this.state = {
-            value: this.props.initialValue,
-        };
+    const onChange = (event: React.FormEvent<HTMLInputElement>) => {
+        setValue(parseFloat(event.currentTarget.value));
+    };
 
-        this.onChange = this.onChange.bind(this);
-    }
-
-    onChange(event: React.FormEvent<HTMLInputElement>) {
-        this.setState({ value: parseFloat(event.currentTarget.value) });
-    }
-
-    render() {
-        return (
-            <input
-                key={this.props.id}
-                type="range"
-                min={this.props.min}
-                max={this.props.max}
-                step={this.props.step || 1}
-                value={this.state.value}
-                className="slider"
-                id={this.props.id}
-                onInput={this.props.onInput}
-                onChange={this.onChange}
-            />
-        );
-    }
+    return (
+        <input
+            key={id}
+            type="range"
+            min={min}
+            max={max}
+            step={step || 1}
+            value={value}
+            className="slider"
+            id={id}
+            onInput={onInput}
+            onChange={onChange}
+        />
+    );
 }

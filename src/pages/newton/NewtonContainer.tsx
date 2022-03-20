@@ -163,7 +163,7 @@ export class NewtonContainer extends React.Component<{}, NewtonState> {
                 parseFloat(this.state.c[1])
             );
             this.onWindowResize();
-        } catch (err) {
+        } catch (err: any) {
             this.setState({ errorText: err.message || err });
             return;
         }
