@@ -1,264 +1,89 @@
-import * as React from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Line, Material, PerspectiveCamera, Scene, WebGLRenderer } from "three";
 import { ConfigButton, FullscreenButton, NextButton, ResetButton } from "../../components/buttons";
-import { removeWhitespaceAndFilter } from "../../util/util";
-import { LSystem, ProductionRules } from "./LSystem";
-import { examples } from "./LSystemExamples";
+import useScreenSize from "../../components/hooks/screensize";
+import { LSystem } from "./LSystem";
 import { LSystemModal } from "./LSystemModal";
-import { TurtleCommandMap, TurtleCommandTypes } from "./turtle";
 
-interface LSystemState {
-    height: number;
-    width: number;
-    isConfigOpen: boolean;
-    alphabet: string[];
-    productionRules: ProductionRules;
-    axiom: string;
-    visualization: TurtleCommandMap;
-}
+export function LSystemContainer() {
+    const camera = useRef(new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100000000));
+    const renderer = useRef(new WebGLRenderer());
+    const scene = useRef(new Scene());
+    const mountRef = useRef<HTMLDivElement>(null);
+    const panZoom = useRef<any>();
+    const lines = useRef<Line[]>([]);
+    const animationRef = useRef<number>();
 
-export class LSystemContainer extends React.Component<{}, LSystemState> {
-    scene?: THREE.Scene;
-    camera?: PerspectiveCamera;
-    renderer?: THREE.Renderer;
-    canvas?: HTMLCanvasElement;
-    panZoom: any;
-    level: number;
-    lines?: Line[];
-    lSystem?: LSystem;
-    active = true;
+    useScreenSize((width, height) => {
+        camera.current.aspect = width / height;
+        camera.current.updateProjectionMatrix();
+        renderer.current.setSize(width, height);
+    });
 
-    constructor(props: {}) {
-        super(props);
+    const [isConfigOpen, setIsConfigOpen] = useState(true);
 
-        this.level = 0;
+    //const [isActive, setIsActibe] = useState(true);
+    const [lSystem, setLSystem] = useState(new LSystem({}, "", {}));
 
-        this.state = {
-            height: window.innerHeight,
-            width: window.innerWidth,
-            isConfigOpen: true,
-            alphabet: examples[0].alphabet,
-            axiom: examples[0].axiom,
-            productionRules: examples[0].productionRules,
-            visualization: examples[0].visualization,
-        };
-        this.resetLevel = this.resetLevel.bind(this);
-        this.nextLevel = this.nextLevel.bind(this);
-        this.onAlphabetChange = this.onAlphabetChange.bind(this);
-        this.onAxiomChange = this.onAxiomChange.bind(this);
-        this.onProductionRuleChange = this.onProductionRuleChange.bind(this);
-        this.onAddVisualizationRule = this.onAddVisualizationRule.bind(this);
-        this.onRemoveVisualizationRule = this.onRemoveVisualizationRule.bind(this);
-        this.onVisualizationRuleChange = this.onVisualizationRuleChange.bind(this);
-        this.onSetArgument = this.onSetArgument.bind(this);
-        this.onSetCommand = this.onSetCommand.bind(this);
-    }
-
-    /**
-     * Make sure references are in order and remove
-     * production rules and visualisations for which there
-     * are no symbols any more
-     */
-    deepCopyState(oldState: LSystemState, newAlphabet?: string[]): LSystemState {
-        const alphabet = newAlphabet || oldState.alphabet.slice();
-
-        const productionRules: ProductionRules = {};
-        for (const key of alphabet) {
-            productionRules[key] = oldState.productionRules[key] || "";
+    const update = useCallback(() => {
+        if (true /*isActive*/) {
+            animationRef.current = requestAnimationFrame(update);
+            renderer.current.render(scene.current, camera.current);
         }
+    }, []);
 
-        const defaultVisualization = [{ command: TurtleCommandTypes.MOVE, argument: "0" }];
-        const visualization: TurtleCommandMap = {};
-        for (const key of alphabet) {
-            visualization[key] = (oldState.visualization[key] || defaultVisualization).map((cmd) => ({
-                command: cmd.command,
-                argument: cmd.argument,
-            }));
-        }
-
-        return {
-            isConfigOpen: oldState.isConfigOpen,
-            height: oldState.height,
-            width: oldState.width,
-            alphabet,
-            axiom: oldState.axiom,
-            productionRules,
-            visualization,
-        };
-    }
-
-    onWindowResize() {
-        this.setState(
-            {
-                height: window.innerHeight,
-                width: window.innerWidth,
-            },
-            () => {
-                this.camera!.aspect = this.state.width / this.state.height;
-                this.camera!.updateProjectionMatrix();
-                this.renderer!.setSize(this.state.width, this.state.height);
-            }
-        );
-    }
-
-    componentDidMount() {
-        this.scene = new Scene();
-        this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100000000);
-
-        // @ts-ignore
-        this.panZoom = require("three.map.control")(this.camera, document.getElementById("canvas-div")); // eslint-disable-line
-
-        this.renderer = new WebGLRenderer();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.canvas = document.getElementById("canvas-div")!.appendChild(this.renderer.domElement);
-
-        this.camera.position.z = 5;
-        this.update();
-        window.addEventListener("resize", this.onWindowResize.bind(this, false));
-        window.addEventListener("orientationchange", this.onWindowResize.bind(this, false));
-        window.addEventListener("load", this.onWindowResize.bind(this, false));
-    }
-
-    update() {
-        if (this.active && this.canvas) {
-            requestAnimationFrame(() => this.update());
-            this.renderer!.render(this.scene!, this.camera!);
-        }
-    }
-
-    resetLevel() {
-        if (this.lines) {
-            this.scene!.remove(...this.lines);
-            this.lines.map((l) => l.geometry.dispose());
-            this.lines.map((l) => (l.material as Material).dispose());
-        }
-        this.lSystem!.evolveTo(0);
-        this.lines = this.lSystem!.getLine();
-        this.lines!.map((l) => this.scene!.add(l));
-    }
-
-    nextLevel() {
-        this.scene!.clear();
-        this.lines!.map((l) => l.geometry.dispose());
-        this.lines!.map((l) => (l.material as Material).dispose());
-        this.lSystem!.produce();
-        this.lines = this.lSystem!.getLine();
-        this.lines!.map((l) => this.scene!.add(l));
-    }
-
-    componentWillUnmount() {
-        window.removeEventListener("resize", this.onWindowResize);
-        window.removeEventListener("orientationchange", this.onWindowResize);
-        window.removeEventListener("load", this.onWindowResize);
-        this.canvas!.remove();
-        this.panZoom.dispose();
-        this.active = false;
-    }
-
-    selectExample(example: {
-        alphabet: string[];
-        productionRules: ProductionRules;
-        axiom: string;
-        visualization: TurtleCommandMap;
-    }) {
-        this.setState(example);
-    }
-
-    loadLSystem = () => {
-        this.lSystem = new LSystem(this.state.productionRules, this.state.axiom, this.state.visualization);
-        this.resetLevel();
-        this.setState({ isConfigOpen: false });
+    const clearScene = () => {
+        scene.current.remove(...lines.current);
+        lines.current.map((l) => l.geometry.dispose());
+        lines.current.map((l) => (l.material as Material).dispose());
     };
 
-    onAlphabetChange(e: React.FormEvent<HTMLInputElement>) {
-        const v = e.currentTarget.value.match(/\S+/g) || [];
-        this.setState((prevState) => this.deepCopyState(prevState, v));
-    }
+    const resetLevel = () => {
+        clearScene();
+        lSystem.evolveTo(0);
+        lines.current = lSystem!.getLine();
+        lines.current.map((l) => scene.current!.add(l));
+    };
 
-    onAxiomChange(e: React.FormEvent<HTMLInputElement>) {
-        const v = removeWhitespaceAndFilter(e.currentTarget.value, this.state.alphabet);
-        this.setState({ axiom: v });
-    }
+    const loadLSystem = (lSystem: LSystem) => {
+        setLSystem(lSystem);
+        resetLevel();
+        setIsConfigOpen(false);
+    };
 
-    onProductionRuleChange(symbol: string, value: string) {
-        this.setState((prevState) => {
-            const newState = this.deepCopyState(prevState);
-            newState.productionRules[symbol] = value;
-            return newState;
-        });
-    }
+    const nextLevel = () => {
+        clearScene();
+        lSystem!.produce();
+        lines.current = lSystem!.getLine();
+        lines.current.map((l) => scene.current.add(l));
+    };
 
-    onRemoveVisualizationRule(symbol: string) {
-        this.setState((prevState) => {
-            const newState = this.deepCopyState(prevState);
-            newState.visualization[symbol].pop();
-            return newState;
-        });
-    }
+    useEffect(() => {
+        panZoom.current = require("three.map.control")(camera.current, mountRef.current);
+        renderer.current.setSize(window.innerWidth, window.innerHeight);
+        mountRef.current?.appendChild(renderer.current.domElement);
 
-    onAddVisualizationRule(symbol: string) {
-        this.setState((prevState) => {
-            const newState = this.deepCopyState(prevState);
-            newState.visualization[symbol].push({
-                argument: 0,
-                command: TurtleCommandTypes.MOVE,
-            });
-            return newState;
-        });
-    }
+        camera.current.position.z = 5;
+        update();
+        return () => {
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            mountRef.current?.removeChild(renderer.current.domElement);
+            panZoom.current.dispose();
+            cancelAnimationFrame(animationRef.current!);
+            //this.active = false;
+        };
+    }, [update]);
 
-    onVisualizationRuleChange(symbol: string, value: string) {
-        this.setState((prevState) => {
-            const newState = this.deepCopyState(prevState);
-            newState.productionRules[symbol] = value;
-            return newState;
-        });
-    }
-
-    onSetArgument(symbol: string, i: number, argument: string) {
-        this.setState((prevState) => {
-            const newState = this.deepCopyState(prevState);
-            newState.visualization[symbol][i].argument = parseFloat(argument);
-            return newState;
-        });
-    }
-
-    onSetCommand(symbol: string, i: number, command: TurtleCommandTypes) {
-        this.setState((prevState) => {
-            const newState = this.deepCopyState(prevState);
-            newState.visualization[symbol][i].command = command;
-            return newState;
-        });
-    }
-
-    render() {
-        return (
-            <React.Fragment>
-                <div id="canvas-div" />
-                <LSystemModal
-                    isOpen={this.state.isConfigOpen}
-                    alphabet={this.state.alphabet}
-                    onAlphabetChange={this.onAlphabetChange}
-                    axiom={this.state.axiom}
-                    onAxiomChange={this.onAxiomChange}
-                    onLoad={this.loadLSystem}
-                    onSelectExample={(example) => this.selectExample(example)}
-                    productionRules={this.state.productionRules}
-                    onProductionRuleChange={this.onProductionRuleChange}
-                    visualizations={this.state.visualization}
-                    onAddVisualizaitionRule={this.onAddVisualizationRule}
-                    onRemoveVisualizationRule={this.onRemoveVisualizationRule}
-                    onVisualizationRuleChange={this.onVisualizationRuleChange}
-                    onSetArgument={this.onSetArgument}
-                    onSetCommand={this.onSetCommand}
-                />
-                <div id="controls-container">
-                    <NextButton onClick={this.nextLevel} />
-                    <ResetButton onClick={this.resetLevel} />
-                    <ConfigButton onClick={() => this.setState({ isConfigOpen: true })} />
-                    <FullscreenButton />
-                </div>
-            </React.Fragment>
-        );
-    }
+    return (
+        <>
+            <div id="canvas-div" ref={mountRef} />
+            <LSystemModal isOpen={isConfigOpen} onLoad={loadLSystem} />
+            <div id="controls-container">
+                <NextButton onClick={nextLevel} />
+                <ResetButton onClick={resetLevel} />
+                <ConfigButton onClick={() => setIsConfigOpen(true)} />
+                <FullscreenButton />
+            </div>
+        </>
+    );
 }

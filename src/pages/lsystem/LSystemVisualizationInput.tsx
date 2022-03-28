@@ -18,7 +18,6 @@ export const LSystemVisualizationInput = (props: {
     visualizations: TurtleCommandMap;
     onAddRule: (symbol: string) => void;
     onRemoveRule: (symbol: string) => void;
-    onRuleChange: (symbol: string, value: string) => void;
     onSetArgument: (symbol: string, i: number, argument: string) => void;
     onSetCommand: (symbol: string, i: number, command: TurtleCommandTypes) => void;
 }) => {

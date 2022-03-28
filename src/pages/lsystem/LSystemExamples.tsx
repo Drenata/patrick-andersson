@@ -1,21 +1,12 @@
 import * as React from "react";
-import { ProductionRules } from "./LSystem";
-import { TurtleCommandMap, TurtleCommandTypes } from "./turtle";
+import { LSystemState } from "./LSystemModal";
+import { TurtleCommandTypes } from "./turtle";
 
-export interface Example {
-    alphabet: string[];
-    productionRules: ProductionRules;
-    axiom: string;
-    visualization: TurtleCommandMap;
+interface Example extends LSystemState {
+    name: string;
 }
 
-export const examples: {
-    name: string;
-    alphabet: string[];
-    productionRules: ProductionRules;
-    axiom: string;
-    visualization: TurtleCommandMap;
-}[] = [
+export const examples: Example[] = [
     {
         name: "Fractal (binary) tree",
         alphabet: ["0", "1", "[", "]"],
