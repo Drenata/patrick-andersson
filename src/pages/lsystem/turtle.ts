@@ -3,9 +3,11 @@ import { Color } from "../../util/color";
 
 export enum TurtleCommandTypes {
     MOVE,
+    MOVE_WITHOUT_DRAWING,
     ROTATE,
     PUSH,
     POP,
+    NOOP,
 }
 
 export interface TurtleCommand {
@@ -78,6 +80,21 @@ export class TurtleGraphics {
                             0,
                         ];
 
+                        this.positions[this.l++] = this.location[0];
+                        this.positions[this.l++] = this.location[1];
+                        this.positions[this.l++] = this.location[2];
+                        break;
+
+                    case TurtleCommandTypes.MOVE_WITHOUT_DRAWING:
+                        if (this.l > 3) {
+                            this.lines.push(this.positions.slice(0, this.l));
+                        }
+                        this.l = 0;
+                        this.location = [
+                            this.location[0] + Math.cos(this.orientation) * command.argument,
+                            this.location[1] + Math.sin(this.orientation) * command.argument,
+                            0,
+                        ];
                         this.positions[this.l++] = this.location[0];
                         this.positions[this.l++] = this.location[1];
                         this.positions[this.l++] = this.location[2];

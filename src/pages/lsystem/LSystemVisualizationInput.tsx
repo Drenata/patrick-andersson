@@ -3,10 +3,12 @@ import { ProductionRules } from "./LSystem";
 import { TurtleCommandMap, TurtleCommandTypes } from "./turtle";
 
 const TurtleCommandNames = {
-    Move: TurtleCommandTypes.MOVE,
-    Rotate: TurtleCommandTypes.ROTATE,
-    "Push state": TurtleCommandTypes.PUSH,
-    "Pop state": TurtleCommandTypes.POP,
+    [TurtleCommandTypes.MOVE]: "Move",
+    [TurtleCommandTypes.MOVE_WITHOUT_DRAWING]: "Move without drawing",
+    [TurtleCommandTypes.ROTATE]: "Rotate",
+    [TurtleCommandTypes.PUSH]: "Push state",
+    [TurtleCommandTypes.POP]: "Pop state",
+    [TurtleCommandTypes.NOOP]: "Do nothing",
 };
 
 /**
@@ -88,26 +90,17 @@ const VisualizationCommand = (props: {
     const command = props.visualization[props.symbol][props.i];
     let argument: JSX.Element | undefined;
 
-    const setArgument = (e: React.FormEvent<HTMLInputElement>) => {
-        const v = e.currentTarget.value;
-        props.onSetArgument(props.symbol, props.i, v);
-    };
+    const setArgument = (e: React.FormEvent<HTMLInputElement>) =>
+        props.onSetArgument(props.symbol, props.i, e.currentTarget.value);
 
-    const setCommand = (e: React.FormEvent<HTMLSelectElement>) => {
-        const s = e.currentTarget.value;
-        if (s in TurtleCommandNames) {
-            const v = TurtleCommandNames[s as keyof typeof TurtleCommandNames];
-            props.onSetCommand(props.symbol, props.i, v);
-        }
-    };
+    const setCommand = (e: React.FormEvent<HTMLSelectElement>) =>
+        props.onSetCommand(props.symbol, props.i, parseInt(e.currentTarget.value));
 
-    const options = (Object.keys(TurtleCommandTypes) as Array<keyof typeof TurtleCommandTypes>).map((type) => (
-        <option key={type} value={TurtleCommandTypes[type]}>
-            {TurtleCommandTypes[type]}
-        </option>
-    ));
-
-    if (command.command === TurtleCommandTypes.MOVE || command.command === TurtleCommandTypes.ROTATE) {
+    if (
+        command.command === TurtleCommandTypes.MOVE ||
+        command.command === TurtleCommandTypes.MOVE_WITHOUT_DRAWING ||
+        command.command === TurtleCommandTypes.ROTATE
+    ) {
         argument = (
             <input
                 key={props.symbol + "-visualization-argument"}
@@ -122,7 +115,24 @@ const VisualizationCommand = (props: {
     return (
         <div className={"visualization-command"}>
             <select key={command.command + command.argument} value={command.command} onChange={setCommand}>
-                {options}
+                <option key={TurtleCommandTypes.MOVE} value={TurtleCommandTypes.MOVE}>
+                    {TurtleCommandNames[TurtleCommandTypes.MOVE]}
+                </option>
+                <option key={TurtleCommandTypes.MOVE_WITHOUT_DRAWING} value={TurtleCommandTypes.MOVE_WITHOUT_DRAWING}>
+                    {TurtleCommandNames[TurtleCommandTypes.MOVE_WITHOUT_DRAWING]}
+                </option>
+                <option key={TurtleCommandTypes.ROTATE} value={TurtleCommandTypes.ROTATE}>
+                    {TurtleCommandNames[TurtleCommandTypes.ROTATE]}
+                </option>
+                <option key={TurtleCommandTypes.PUSH} value={TurtleCommandTypes.PUSH}>
+                    {TurtleCommandNames[TurtleCommandTypes.PUSH]}
+                </option>
+                <option key={TurtleCommandTypes.POP} value={TurtleCommandTypes.POP}>
+                    {TurtleCommandNames[TurtleCommandTypes.POP]}
+                </option>
+                <option key={TurtleCommandTypes.NOOP} value={TurtleCommandTypes.NOOP}>
+                    {TurtleCommandNames[TurtleCommandTypes.NOOP]}
+                </option>
             </select>
             {argument}
         </div>
