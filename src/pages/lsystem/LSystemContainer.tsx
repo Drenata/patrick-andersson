@@ -23,7 +23,7 @@ export function LSystemContainer() {
     const [isConfigOpen, setIsConfigOpen] = useState(true);
 
     //const [isActive, setIsActibe] = useState(true);
-    const [lSystem, setLSystem] = useState(new LSystem({}, "", {}));
+    const lSystemRef = useRef(new LSystem({}, "", {}));
 
     const update = useCallback(() => {
         if (true /*isActive*/) {
@@ -40,21 +40,21 @@ export function LSystemContainer() {
 
     const resetLevel = () => {
         clearScene();
-        lSystem.evolveTo(0);
-        lines.current = lSystem!.getLine();
+        lSystemRef.current.evolveTo(0);
+        lines.current = lSystemRef.current.getLine();
         lines.current.map((l) => scene.current!.add(l));
     };
 
     const loadLSystem = (lSystem: LSystem) => {
-        setLSystem(lSystem);
+        lSystemRef.current = lSystem;
         resetLevel();
         setIsConfigOpen(false);
     };
 
     const nextLevel = () => {
         clearScene();
-        lSystem!.produce();
-        lines.current = lSystem!.getLine();
+        lSystemRef.current.produce();
+        lines.current = lSystemRef.current.getLine();
         lines.current.map((l) => scene.current.add(l));
     };
 
