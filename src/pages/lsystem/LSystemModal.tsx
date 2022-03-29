@@ -5,7 +5,7 @@ import { LSystem, ProductionRules } from "./LSystem";
 import { examples, LSystemExamples } from "./LSystemExamples";
 import { LSystemProductionRulesInput } from "./LSystemProductionRulesInput";
 import { LSystemVisualizationInput } from "./LSystemVisualizationInput";
-import { TurtleCommand, TurtleCommandMap, TurtleCommandTypes } from "./turtle";
+import { TurtleCommandMap, TurtleCommandTypes } from "./turtle";
 
 export interface LSystemState {
     alphabet: string[];
